@@ -36,6 +36,7 @@
 - [ ] Build versioned prompt datasets and task-specific metrics.
 - [ ] Record prompt version, model/runtime configuration, dataset, and metric definitions.
 - [ ] Add human review workflows; any model-as-judge option stays optional.
+- [x] Keep evaluation execution local and optional; no hosted LLM call is made.
 - [ ] Expand the handbook with sourced content, not unsupported effectiveness percentages.
 
 ## M6 — Release hardening
