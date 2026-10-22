@@ -133,7 +133,7 @@ export default function App() {
     updateEvaluationCases(current);
    }
    if (evaluationCancelRef.current) {
-    if (activeCase?.text.trim()) current = current.map((item) => item.id === activeCase?.id ? { ...item, actual: activeCase.text } : item);
+    if (activeCase && activeCase.text.trim()) { const partialCase = activeCase; current = current.map((item) => item.id === partialCase.id ? { ...item, actual: partialCase.text } : item); }
     updateEvaluationCases(current);
     setEvaluationProgress("Stopped by you. Completed outputs were retained; this partial run was not added to history.");
     return;
@@ -148,7 +148,7 @@ export default function App() {
    const runsSaved = writeEvaluationRuns(nextRuns);
    setEvaluationProgress("Run complete: " + run.matched + " of " + run.completed + " completed outputs exactly matched. This small dataset is a smoke test, not a general quality benchmark." + (runsSaved ? "" : " The run history could not be saved."));
   } catch (error) {
-   if (activeCase?.text.trim()) current = current.map((item) => item.id === activeCase?.id ? { ...item, actual: activeCase.text } : item);
+   if (activeCase && activeCase.text.trim()) { const partialCase = activeCase; current = current.map((item) => item.id === partialCase.id ? { ...item, actual: partialCase.text } : item); }
    updateEvaluationCases(current);
    if (evaluationCancelRef.current) setEvaluationProgress("Stopped by you. Completed outputs were retained; this partial run was not added to history.");
    else {
