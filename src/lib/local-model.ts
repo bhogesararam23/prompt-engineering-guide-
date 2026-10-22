@@ -1,13 +1,19 @@
 export const DEFAULT_MODEL_ID = "Llama-3.2-1B-Instruct-q4f32_1-MLC";
 
+type CompletionMessage = { role: "system" | "user"; content: string };
+type CompletionChunk = { choices?: Array<{ delta?: { content?: string | null } }> };
+type CompletionResponse = { choices?: Array<{ message?: { content?: string | null } }> };
+type CompletionResult = CompletionResponse | AsyncIterable<CompletionChunk>;
+
 type Engine = {
   chat: {
     completions: {
       create: (request: {
-        messages: Array<{ role: "system" | "user"; content: string }>;
+        messages: CompletionMessage[];
         temperature?: number;
         max_tokens?: number;
-      }) => Promise<{ choices?: Array<{ message?: { content?: string | null } }> }>;
+        stream?: boolean;
+      }) => Promise<CompletionResult>;
     };
   };
   unload?: () => Promise<void>;
@@ -56,18 +62,44 @@ export async function loadLocalModel(onProgress: (message: string) => void): Pro
   }
 }
 
-export async function generateLocally(system: string, prompt: string): Promise<string> {
+export async function generateLocally(
+  system: string,
+  prompt: string,
+  onText?: (completeText: string) => void
+): Promise<string> {
   if (!enginePromise) throw new Error("Load the local model before generating a response.");
   const engine = await enginePromise;
-  const messages: Array<{ role: "system" | "user"; content: string }> = [];
+  const messages: CompletionMessage[] = [];
   if (system.trim()) messages.push({ role: "system", content: system.trim() });
   messages.push({ role: "user", content: prompt });
-  const result = await engine.chat.completions.create({ messages, temperature: 0.4, max_tokens: 512 });
-  const content = result.choices?.[0]?.message?.content;
-  if (typeof content !== "string" || !content.trim()) {
+
+  const result = await engine.chat.completions.create({
+    messages,
+    temperature: 0.4,
+    max_tokens: 512,
+    stream: true
+  });
+
+  let completeText = "";
+  if (result && typeof (result as AsyncIterable<CompletionChunk>)[Symbol.asyncIterator] === "function") {
+    for await (const chunk of result as AsyncIterable<CompletionChunk>) {
+      const piece = chunk.choices?.[0]?.delta?.content;
+      if (typeof piece === "string" && piece.length > 0) {
+        completeText += piece;
+        onText?.(completeText);
+      }
+    }
+  } else {
+    const response = result as CompletionResponse;
+    const content = response.choices?.[0]?.message?.content;
+    if (typeof content === "string") completeText = content;
+    onText?.(completeText);
+  }
+
+  if (!completeText.trim()) {
     throw new Error("The local model returned no text. Try a shorter prompt or reload the model.");
   }
-  return content;
+  return completeText;
 }
 
 export function interruptLocalGeneration(): void {
