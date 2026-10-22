@@ -11,6 +11,8 @@ A local-first learning guide and prompt workbench. Learn practical prompting tec
 - Deterministic prompt assembly and basic validation; previews do not call an LLM.
 - Reusable templates for summarization, structured extraction, code review, and comparison.
 - Browser-local prompt library with JSON import/export.
+- Lesson completion and bookmarks persisted locally, with a learning-progress overview.
+- Production service worker caches the app shell and same-origin assets for repeat offline visits; API data and remote model weights are deliberately not cached.
 - Optional WebLLM inference using WebGPU-capable browsers.
 - Optional FastAPI backend with SQLite persistence and deterministic validation.
 - TypeScript checks, unit tests, API tests, and CI workflow.
