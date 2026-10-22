@@ -119,6 +119,34 @@ export function readEvaluationRuns(): EvaluationRun[] {
   }
 }
 
+export function exportEvaluationDataset(cases: EvaluationCase[]): string {
+  return JSON.stringify({
+    schemaVersion: 1,
+    kind: "prompt-engineering-guide-evaluation-dataset",
+    exportedAt: new Date().toISOString(),
+    cases: cases.slice(0, 100)
+  }, null, 2);
+}
+
+export function parseEvaluationDataset(raw: string): EvaluationCase[] {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    throw new Error("This file is not valid JSON.");
+  }
+  if (!parsed || typeof parsed !== "object" || !("cases" in parsed) || !Array.isArray(parsed.cases)) {
+    throw new Error("This file is not an evaluation dataset export.");
+  }
+  const items = parsed.cases as unknown[];
+  if (items.length > 100) throw new Error("A dataset may contain at most 100 cases.");
+  if (!items.every(isEvaluationCase)) throw new Error("Each case must contain string id, name, input, expected, and actual fields.");
+  if (items.some((item) => item.name.length > 200 || item.input.length > 100_000 || item.expected.length > 20_000 || item.actual.length > 50_000)) {
+    throw new Error("A case exceeds the maximum allowed field length.");
+  }
+  return items;
+}
+
 export function writeEvaluationRuns(runs: EvaluationRun[]): boolean {
   try {
     localStorage.setItem(RUNS_KEY, JSON.stringify(runs.slice(0, 20)));
