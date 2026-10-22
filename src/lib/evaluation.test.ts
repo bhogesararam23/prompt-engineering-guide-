@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   isExactMatch,
   readEvaluationCases,
+  exportEvaluationDataset,
+  parseEvaluationDataset,
   readEvaluationRuns,
   starterEvaluationCases,
   summarizeEvaluation,
@@ -38,6 +40,13 @@ describe("local prompt evaluation", () => {
     ];
     const result = summarizeEvaluation(cases, { promptTitle: "Sentiment", modelId: "local-test", id: "run-1", createdAt: "2026-10-23T00:00:00Z" });
     expect(result).toMatchObject({ total: 4, completed: 2, matched: 1, exactMatchRate: 0.5, promptTitle: "Sentiment" });
+  });
+
+  it("exports and validates portable evaluation datasets", () => {
+    const cases = [{ ...starterEvaluationCases[0], actual: "positive" }];
+    expect(parseEvaluationDataset(exportEvaluationDataset(cases))).toEqual(cases);
+    expect(() => parseEvaluationDataset("not-json")).toThrow(/valid JSON/);
+    expect(() => parseEvaluationDataset(JSON.stringify({ cases: [{ id: "bad" }] }))).toThrow(/string id/);
   });
 
   it("loads starter cases when there is no saved dataset", () => {
