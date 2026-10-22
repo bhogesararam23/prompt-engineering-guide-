@@ -6,14 +6,15 @@ A local-first learning guide and prompt workbench. Learn practical prompting tec
 
 ## Features
 
-- Eight typed lesson modules from foundations through context engineering, evaluation, and prompt security.
+- Eight structured lesson modules from foundations through context engineering, evaluation, and prompt security, with authoritative references.
 - Prompt Lab for role, task, context, examples, input, constraints, and output format.
 - Deterministic prompt assembly and basic validation; previews do not call an LLM.
+- An evaluation bench with editable test cases, exact-match scoring, locally generated outputs, cancellation, export/import, and saved prompt/dataset snapshots.
 - Reusable templates for summarization, structured extraction, code review, and comparison.
 - Browser-local prompt library with JSON import/export.
 - Lesson completion and bookmarks persisted locally, with a learning-progress overview.
 - Production service worker caches the app shell and same-origin assets for repeat offline visits; API data and remote model weights are deliberately not cached.
-- Optional WebLLM inference using WebGPU-capable browsers.
+- Optional WebLLM inference using WebGPU-capable browsers, run in a dedicated worker with streamed output and interruption.
 - Optional FastAPI backend with SQLite persistence and deterministic validation.
 - TypeScript checks, unit tests, API tests, and CI workflow.
 
