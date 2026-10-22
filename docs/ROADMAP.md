@@ -16,13 +16,15 @@
 - [x] Foundation and advanced lesson modules with practical examples.
 - [x] Prompt templates and structured prompt fields.
 - [x] Save, copy, search lessons, filter categories, and export/import prompt library.
-- [ ] Add bookmarks, lesson completion progress, accessible keyboard navigation review, and robust import deduplication.
+- [x] Add bookmarks, lesson completion progress, and progress persistence tests.
+- [ ] Complete keyboard-navigation review and robust duplicate handling for imports.
 
 ## M3 — Local inference
 - [x] Isolate WebLLM in a dedicated adapter with explicit load/unload actions.
 - [x] Provide no-model fallback and WebGPU capability messaging.
+- [x] Isolate inference in a dedicated Web Worker.
 - [ ] Verify model ID against the installed runtime and test target devices.
-- [ ] Add streaming, cancellation, memory/resource recovery, and honest offline tests.
+- [ ] Add streaming/cancellation, memory/resource recovery, and end-to-end offline tests.
 
 ## M4 — Optional backend
 - [x] FastAPI service with SQLite prompt persistence and deterministic validation.
@@ -37,6 +39,7 @@
 - [ ] Expand the handbook with sourced content, not unsupported effectiveness percentages.
 
 ## M6 — Release hardening
+- [x] Add production app-shell caching for repeat offline visits; model weights and API calls are intentionally excluded.
 - [ ] Add end-to-end browser tests and accessibility audit.
 - [ ] Audit dependencies, licenses, model weights, and actual network traffic.
 - [ ] Test a clean install, mobile layout, local inference, failure recovery, and offline behavior.
