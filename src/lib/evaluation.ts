@@ -6,15 +6,19 @@ export type EvaluationCase = {
   actual: string;
 };
 
+export type ScoredEvaluationCase = EvaluationCase & { matched: boolean | null };
+
 export type EvaluationRun = {
   id: string;
   createdAt: string;
   promptTitle: string;
+  promptSnapshot: string;
   modelId: string;
   total: number;
   completed: number;
   matched: number;
   exactMatchRate: number;
+  cases: ScoredEvaluationCase[];
 };
 
 export const starterEvaluationCases: EvaluationCase[] = [
@@ -39,20 +43,27 @@ export function isExactMatch(expected: string, actual: string): boolean {
 export function summarizeEvaluation(cases: EvaluationCase[], context: {
   promptTitle: string;
   modelId: string;
+  promptSnapshot?: string;
   createdAt?: string;
   id?: string;
 }): EvaluationRun {
-  const eligible = cases.filter((item) => item.expected.trim().length > 0 && item.actual.trim().length > 0);
-  const matched = eligible.filter((item) => isExactMatch(item.expected, item.actual)).length;
+  const scoredCases: ScoredEvaluationCase[] = cases.map((item) => {
+    const canScore = item.expected.trim().length > 0 && item.actual.trim().length > 0;
+    return { ...item, matched: canScore ? isExactMatch(item.expected, item.actual) : null };
+  });
+  const eligible = scoredCases.filter((item) => item.matched !== null);
+  const matched = eligible.filter((item) => item.matched === true).length;
   return {
     id: context.id || (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Date.now())),
     createdAt: context.createdAt || new Date().toISOString(),
     promptTitle: context.promptTitle.trim() || "Untitled prompt",
+    promptSnapshot: context.promptSnapshot || "",
     modelId: context.modelId,
     total: cases.length,
     completed: eligible.length,
     matched,
-    exactMatchRate: eligible.length ? matched / eligible.length : 0
+    exactMatchRate: eligible.length ? matched / eligible.length : 0,
+    cases: scoredCases
   };
 }
 
@@ -96,7 +107,13 @@ export function readEvaluationRuns(): EvaluationRun[] {
         typeof row.promptTitle === "string" && typeof row.modelId === "string" &&
         typeof row.total === "number" && typeof row.completed === "number" &&
         typeof row.matched === "number" && typeof row.exactMatchRate === "number";
-    }).slice(0, 20);
+    }).map((row) => ({
+      ...row,
+      promptSnapshot: typeof row.promptSnapshot === "string" ? row.promptSnapshot : "",
+      cases: Array.isArray(row.cases) ? row.cases.filter((item): item is ScoredEvaluationCase =>
+        isEvaluationCase(item) && "matched" in item && (typeof item.matched === "boolean" || item.matched === null)
+      ) : []
+    })).slice(0, 20);
   } catch {
     return [];
   }
