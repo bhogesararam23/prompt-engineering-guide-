@@ -67,6 +67,10 @@ The API stores prompts in a local SQLite database and provides health and determ
 4. No secrets in client code: never commit keys or put secrets in frontend environment variables.
 5. Quality gates before claims: a feature is not marked complete until the relevant check actually passes.
 
+## Licensing and release readiness
+
+No project license has been selected in this rebuild branch. Until a LICENSE file is added by the maintainer, do not assume that public visibility grants permission to redistribute or reuse the code. See [the release checklist](docs/RELEASE_CHECKLIST.md) for the remaining security, test, and deployment gates.
+
 ## Current scope
 
 The frontend and API are separate capabilities. Prompt transfer is explicit and manually initiated; automatic/background sync, accounts, content administration, richer evaluation metrics, and fully offline model packaging remain future milestones.
