@@ -16,6 +16,7 @@ export type WorkflowEvaluationCaseResult = WorkflowEvaluationCase & {
   execution: "success" | "failed" | "cancelled";
   matched: boolean | null;
   workflowRunId?: string;
+  trace?: WorkflowRun["nodeRuns"];
   errors: string[];
 };
 export type WorkflowEvaluationRun = {
@@ -119,7 +120,7 @@ export async function evaluateWorkflow(
         signal: options.signal
       });
       if (run.status === "cancelled") {
-        result = { ...item, actual: run.output, execution: "cancelled", matched: null, workflowRunId: run.id, errors: run.errors };
+        result = { ...item, actual: run.output, execution: "cancelled", matched: null, workflowRunId: run.id, trace: run.nodeRuns, errors: run.errors };
       } else {
         const successful = run.status === "success";
         result = {
@@ -128,6 +129,7 @@ export async function evaluateWorkflow(
           execution: successful ? "success" : "failed",
           matched: successful ? scoreCase(item.expected, run.output, item.matchRule) : false,
           workflowRunId: run.id,
+          trace: run.nodeRuns,
           errors: run.errors
         };
       }
