@@ -6,6 +6,7 @@ import { runWorkflow, type HumanReviewDecision, type HumanReviewRequest, type Lo
 import { validateWorkflow, workflowHasErrors } from "../lib/workflow/validate";
 import type { WorkflowDefinition, WorkflowNode, WorkflowNodeType, WorkflowRun } from "../lib/workflow/types";
 import { interruptLocalGeneration } from "../lib/local-model";
+import WorkflowEvaluationPanel from "./WorkflowEvaluationPanel";
 
 type Props = {
   modelReady: boolean;
@@ -489,6 +490,8 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
         {lastRun?.errors.map((item) => <p className="check-error" key={item}>! {item}</p>)}
         {lastRun?.output ? <div className="workflow-final-output"><h4>Final output</h4><pre>{lastRun.output}</pre><button className="button secondary" type="button" onClick={() => void navigator.clipboard.writeText(lastRun.output).then(() => setNotice("Final output copied."), () => setNotice("Clipboard permission was blocked."))}>Copy final output</button></div> : null}</div>}
     </section>
+
+    <WorkflowEvaluationPanel workflow={workflow} modelReady={modelReady} generateLocal={(prompt, systemPrompt, signal) => generateLocal(prompt, systemPrompt, signal)} />
 
     <section className="workflow-history-panel"><div className="section-title-row"><div><p className="eyebrow">LOCAL HISTORY</p><h2>Recent workflow runs</h2></div><button type="button" className="text-button" onClick={() => { setHistory([]); writeWorkflowRuns([]); setNotice("Local workflow run history cleared."); }}>Clear history</button></div>{history.length ? history.map((item) => <button key={item.id} type="button" className="workflow-history-item" onClick={() => { setLastRun(item); setLiveRuns(item.nodeRuns); setNotice("Showing a locally saved run snapshot."); }}><span><strong>{item.workflowName}</strong><small>{timeLabel(item.startedAt)}</small></span><span className={"workflow-node-run " + item.status}>{runStatusLabel(item.status)}</span></button>) : <p className="muted">No workflow runs saved yet.</p>}</section>
     {pendingReview && <div className="workflow-review-backdrop">
