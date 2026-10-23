@@ -56,3 +56,22 @@
 - [ ] Publish reproducible deployment and rollback instructions.
 
 A checkbox means code exists, not that quality gates have passed. Keep unfinished requirements visible.
+
+## M7 — Advanced prompting techniques and workflow builder (specified, not implemented)
+
+The scope and acceptance criteria are documented in [Advanced Prompting and Workflow Builder Specification](ADVANCED_PROMPTING_SPEC.md). This milestone records planned work only; do not mark an implementation task complete because the specification exists.
+
+- [x] Research and document current official OpenAI, Anthropic, and Google prompting guidance with primary-source links.
+- [x] Clarify that “looped prompting” and “graph workflow prompting” are project terminology, not shared official vendor names.
+- [x] Define the Advanced Techniques Library, bounded self-correction loop, visual graph workflow editor, typed workflow schema, local-first execution boundaries, evaluation integration, safety constraints, accessibility requirements, and acceptance criteria.
+- [ ] Review and freeze the product scope before implementation.
+- [ ] Build the source-linked Advanced Techniques Library and provider-aware learning modules.
+- [ ] Implement typed workflow schema, validated import/export, graph analysis, and static diagnostics.
+- [ ] Build the graph canvas plus accessible outline editor and starter workflows.
+- [ ] Implement deterministic node execution, explicit local-model prompt nodes, finite loop controllers, cancellation, and trace inspection.
+- [ ] Integrate workflow versions and run traces with the existing Evaluation Bench.
+- [ ] Add automated coverage for malformed graphs, cycles, loop budgets, branch/merge semantics, cancellation, storage errors, accessibility, and core journeys.
+- [ ] Verify model-backed behavior on actual supported WebGPU devices before claiming it works on target hardware.
+
+**M7 acceptance gate:** the requirements in the linked specification are implemented and tested. No hosted LLM provider, provider SDK, API key, arbitrary network-call node, or new mandatory backend is added.
+
