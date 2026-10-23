@@ -43,7 +43,9 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
   const [history, setHistory] = useState<WorkflowRun[]>(() => readWorkflowRuns());
   const [running, setRunning] = useState(false);
   const [notice, setNotice] = useState("");
+  const [editorMode, setEditorMode] = useState<"canvas" | "outline">("canvas");
   const abortRef = useRef<AbortController | null>(null);
+  const canvasRef = useRef<HTMLDivElement | null>(null);
   const selectedNode = workflow.nodes.find((node) => node.id === selectedNodeId);
   const validation = useMemo(() => validateWorkflow(workflow), [workflow]);
   const errors = validation.filter((item) => item.severity === "error");
@@ -248,6 +250,27 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
   const selectedSource = workflow.nodes.find((node) => node.id === sourceId);
   const availablePorts = portsFor(selectedSource);
   const latestByNode = new Map((lastRun?.nodeRuns || liveRuns).map((item) => [item.nodeId, item]));
+  const canvasWidth = Math.max(820, Math.min(1800, ...workflow.nodes.map((node) => node.position.x + 245)));
+  const canvasHeight = Math.max(300, Math.min(1400, ...workflow.nodes.map((node) => node.position.y + 125)));
+  const moveNode = (nodeId: string, x: number, y: number) => {
+    updateWorkflow({
+      ...workflow,
+      nodes: workflow.nodes.map((node) => node.id === nodeId ? {
+        ...node,
+        position: { x: Math.max(16, Math.min(1700, Math.round(x))), y: Math.max(16, Math.min(1280, Math.round(y))) }
+      } as WorkflowNode : node)
+    });
+  };
+  const autoArrange = () => {
+    updateWorkflow({
+      ...workflow,
+      nodes: workflow.nodes.map((node, index) => ({
+        ...node,
+        position: { x: 28 + (index % 3) * 265, y: 28 + Math.floor(index / 3) * 150 }
+      } as WorkflowNode))
+    });
+    setNotice("Nodes arranged on a readable grid. You can drag them to refine the layout.");
+  };
   const runStatusLabel = (status: WorkflowRun["status"]) => status === "success" ? "Completed" : status === "cancelled" ? "Cancelled" : "Failed";
 
   return <section className="workflow-builder">
@@ -274,7 +297,70 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
       <section className="workflow-main-panel">
         <div className="panel-heading"><div><p className="eyebrow">WORKFLOW OUTLINE</p><h2>Nodes and connections</h2></div><span>{workflow.nodes.length}/{100}</span></div>
         <div className="workflow-add-node"><div className="field"><label htmlFor="workflow-node-type">Add node type</label><select id="workflow-node-type" value={newNodeType} onChange={(event) => setNewNodeType(event.target.value as WorkflowNodeType)}>{nodeTypes.map((type) => <option key={type} value={type}>{type}</option>)}</select></div><button className="button secondary" type="button" disabled={workflow.nodes.length >= 100} onClick={addNode}>+ Add node</button></div>
-        <div className="workflow-node-list">
+        <div className="workflow-editor-toolbar">
+          <div className="workflow-view-toggle" role="group" aria-label="Workflow editor view">
+            <button type="button" className={editorMode === "canvas" ? "selected" : ""} aria-pressed={editorMode === "canvas"} onClick={() => setEditorMode("canvas")}>Canvas</button>
+            <button type="button" className={editorMode === "outline" ? "selected" : ""} aria-pressed={editorMode === "outline"} onClick={() => setEditorMode("outline")}>Outline</button>
+          </div>
+          <button className="button secondary" type="button" onClick={autoArrange}>Auto-arrange nodes</button>
+        </div>
+        {editorMode === "canvas" ? <div className="workflow-canvas-scroll" aria-label="Visual workflow canvas">
+          <div
+            className="workflow-canvas"
+            ref={canvasRef}
+            style={{ width: canvasWidth, height: canvasHeight }}
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={(event) => {
+              event.preventDefault();
+              const nodeId = event.dataTransfer.getData("text/plain");
+              const rect = canvasRef.current?.getBoundingClientRect();
+              if (!nodeId || !rect || !workflow.nodes.some((node) => node.id === nodeId)) return;
+              moveNode(nodeId, event.clientX - rect.left - 92, event.clientY - rect.top - 30);
+            }}
+          >
+            <svg className="workflow-canvas-edges" width={canvasWidth} height={canvasHeight} role="img" aria-label="Workflow connections">
+              <defs>
+                <marker id="workflow-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                  <path d="M0,0 L0,6 L6,3 z" fill="currentColor" />
+                </marker>
+              </defs>
+              {workflow.edges.map((edge) => {
+                const from = workflow.nodes.find((node) => node.id === edge.from);
+                const to = workflow.nodes.find((node) => node.id === edge.to);
+                if (!from || !to) return null;
+                const x1 = from.position.x + 190;
+                const y1 = from.position.y + 48;
+                const x2 = to.position.x;
+                const y2 = to.position.y + 48;
+                const bend = Math.max(38, Math.abs(x2 - x1) * 0.45);
+                const path = `M ${x1} ${y1} C ${x1 + bend} ${y1}, ${x2 - bend} ${y2}, ${x2} ${y2}`;
+                return <path key={edge.id} className="workflow-canvas-edge" d={path} markerEnd="url(#workflow-arrow)" />;
+              })}
+            </svg>
+            {workflow.nodes.map((node, index) => {
+              const state = latestByNode.get(node.id);
+              return <div
+                key={node.id}
+                className={"workflow-canvas-node" + (node.id === selectedNodeId ? " selected" : "")}
+                style={{ left: node.position.x, top: node.position.y }}
+                draggable
+                onDragStart={(event) => {
+                  event.dataTransfer.effectAllowed = "move";
+                  event.dataTransfer.setData("text/plain", node.id);
+                }}
+              >
+                <button className="workflow-node-card" type="button" onClick={() => setSelectedNodeId(node.id)} aria-pressed={node.id === selectedNodeId}>
+                  <span className="workflow-node-top"><span>NODE {String(index + 1).padStart(2, "0")}</span><span className={"workflow-node-run " + (state?.status || "not-run")}>{state?.status || "not run"}</span></span>
+                  <strong>{node.label}</strong>
+                  <span className="workflow-node-type">{node.type}{node.type === "loop" ? " · max " + node.config.maxIterations + " attempts" : ""}</span>
+                  <span className="workflow-node-id">{node.id}</span>
+                  <span className="workflow-drag-hint">Drag to reposition</span>
+                </button>
+              </div>;
+            })}
+          </div>
+          <p className="field-help">Drag node cards to reposition them. Switch to Outline for keyboard-friendly node selection and connection editing. Positions are saved with the workflow.</p>
+        </div> : <div className="workflow-node-list">
           {workflow.nodes.map((node, index) => {
             const state = latestByNode.get(node.id);
             return <div key={node.id} className={"workflow-node-shell" + (node.id === selectedNodeId ? " selected" : "")}>
@@ -287,7 +373,7 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
               {index < workflow.nodes.length - 1 ? <div className="workflow-flow-cue" aria-hidden="true">↓ connections ↓</div> : null}
             </div>;
           })}
-        </div>
+        </div>}
 
         <div className="workflow-connections">
           <div className="section-title-row"><h3>Connections</h3><span>{workflow.edges.length} edges</span></div>
