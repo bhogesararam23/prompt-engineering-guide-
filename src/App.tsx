@@ -107,7 +107,7 @@ export default function App() {
   generationCancelRef.current = false;
   setBusy(true); setResponse(""); setNotice("");
   try {
-   const finalText = await generateLocally(draft.role, current, (partial) => setResponse(partial));
+   const finalText = await generateLocally("", current, (partial) => setResponse(partial));
    if (generationCancelRef.current) setNotice("Generation stopped. Partial output is retained.");
    else setResponse(finalText);
   } catch (error) {
