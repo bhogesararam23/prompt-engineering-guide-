@@ -25,40 +25,40 @@ export function isWorkflowShape(value: unknown): value is WorkflowDefinition {
 }
 
 function configIssue(node: WorkflowNode): string | null {
-  const c = node.config;
   switch (node.type) {
-    case "input": return nonEmpty(c.key) ? null : "Input nodes need a non-empty input key.";
+    case "input":
+      return nonEmpty(node.config.key) ? null : "Input nodes need a non-empty input key.";
     case "prompt":
-      if (!nonEmpty(c.template)) return "Prompt nodes need a prompt template.";
-      if (c.temperature !== undefined && (!finite(c.temperature) || c.temperature < 0 || c.temperature > 2)) return "Temperature must be between 0 and 2.";
-      if (c.maxTokens !== undefined && (!finite(c.maxTokens) || c.maxTokens < 1 || c.maxTokens > 8192)) return "Maximum tokens must be between 1 and 8192.";
+      if (!nonEmpty(node.config.template)) return "Prompt nodes need a prompt template.";
+      if (node.config.temperature !== undefined && (!finite(node.config.temperature) || node.config.temperature < 0 || node.config.temperature > 2)) return "Temperature must be between 0 and 2.";
+      if (node.config.maxTokens !== undefined && (!finite(node.config.maxTokens) || node.config.maxTokens < 1 || node.config.maxTokens > 8192)) return "Maximum tokens must be between 1 and 8192.";
       return null;
     case "transform":
-      if (!["trim", "uppercase", "lowercase", "prefix", "suffix", "replace"].includes(c.operation)) return "Select a supported transformation operation.";
-      if (c.operation === "replace" && !string(c.search)) return "Replace operations need a search string.";
+      if (!["trim", "uppercase", "lowercase", "prefix", "suffix", "replace"].includes(node.config.operation)) return "Select a supported transformation operation.";
+      if (node.config.operation === "replace" && !nonEmpty(node.config.search)) return "Replace operations need a non-empty search string.";
       return null;
     case "validator":
-      if (!["non-empty", "contains", "equals", "max-length"].includes(c.rule)) return "Select a supported validation rule.";
-      if (["contains", "equals"].includes(c.rule) && !string(c.value)) return "This validation rule needs a comparison value.";
-      if (c.rule === "max-length" && (!finite(c.maxLength) || c.maxLength < 1 || c.maxLength > 100_000)) return "Maximum length must be between 1 and 100000.";
+      if (!["non-empty", "contains", "equals", "max-length"].includes(node.config.rule)) return "Select a supported validation rule.";
+      if (["contains", "equals"].includes(node.config.rule) && !string(node.config.value)) return "This validation rule needs a comparison value.";
+      if (node.config.rule === "max-length" && (!finite(node.config.maxLength) || node.config.maxLength < 1 || node.config.maxLength > 100_000)) return "Maximum length must be between 1 and 100000.";
       return null;
     case "router":
-      if (!["contains", "equals", "is-empty"].includes(c.condition)) return "Select a supported routing condition.";
-      if (c.condition !== "is-empty" && !string(c.value)) return "This routing condition needs a comparison value.";
+      if (!["contains", "equals", "is-empty"].includes(node.config.condition)) return "Select a supported routing condition.";
+      if (node.config.condition !== "is-empty" && !string(node.config.value)) return "This routing condition needs a comparison value.";
       return null;
     case "merge":
-      return ["join", "first-non-empty", "json"].includes(c.strategy) ? null : "Select a supported merge strategy.";
+      return ["join", "first-non-empty", "json"].includes(node.config.strategy) ? null : "Select a supported merge strategy.";
     case "loop":
-      if (!finite(c.maxIterations) || !Number.isInteger(c.maxIterations) || c.maxIterations < 1 || c.maxIterations > 10) return "Loop limit must be an integer from 1 to 10.";
-      if (!nonEmpty(c.draftInstruction) || !nonEmpty(c.reviewInstruction) || !nonEmpty(c.refineInstruction)) return "Loop nodes need draft, review, and refinement instructions.";
-      if (!["non-empty", "contains", "equals", "max-length"].includes(c.evaluator)) return "Select a supported deterministic evaluator.";
-      if (["contains", "equals"].includes(c.evaluator) && !string(c.expectedValue)) return "This loop evaluator needs an expected value.";
-      if (c.evaluator === "max-length" && (!finite(c.maxLength) || c.maxLength < 1 || c.maxLength > 100_000)) return "Loop maximum length must be between 1 and 100000.";
+      if (!finite(node.config.maxIterations) || !Number.isInteger(node.config.maxIterations) || node.config.maxIterations < 1 || node.config.maxIterations > 10) return "Loop limit must be an integer from 1 to 10.";
+      if (!nonEmpty(node.config.draftInstruction) || !nonEmpty(node.config.reviewInstruction) || !nonEmpty(node.config.refineInstruction)) return "Loop nodes need draft, review, and refinement instructions.";
+      if (!["non-empty", "contains", "equals", "max-length"].includes(node.config.evaluator)) return "Select a supported deterministic evaluator.";
+      if (["contains", "equals"].includes(node.config.evaluator) && !string(node.config.expectedValue)) return "This loop evaluator needs an expected value.";
+      if (node.config.evaluator === "max-length" && (!finite(node.config.maxLength) || node.config.maxLength < 1 || node.config.maxLength > 100_000)) return "Loop maximum length must be between 1 and 100000.";
       return null;
-    case "output": return null;
+    case "output":
+      return null;
   }
 }
-
 function allowedPorts(node: WorkflowNode): string[] {
   if (node.type === "router") return ["match", "no-match"];
   if (node.type === "validator") return ["pass", "fail"];
