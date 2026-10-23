@@ -95,3 +95,26 @@ test("workflow builder runs a deterministic graph without local inference", asyn
   await page.getByRole("button", { name: "Save locally" }).click();
   await expect(page.getByRole("status")).toContainText("Workflow saved to this browser");
 });
+
+
+test("human review pauses a workflow and forwards approved edits", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Graph & loops/ }).click();
+  await page.locator(".workflow-file-button input").setInputFiles("e2e/fixtures/human-review-workflow.json");
+  await expect(page.getByRole("status")).toContainText("Workflow imported and validated");
+  await page.locator("#workflow-input-value").fill("Original draft");
+  await page.getByRole("button", { name: "Run workflow" }).click();
+
+  const reviewDialog = page.getByRole("dialog");
+  await expect(reviewDialog).toBeVisible();
+  await expect(reviewDialog.getByRole("heading", { name: "Review release note" })).toBeVisible();
+  await expect(reviewDialog.getByText("Original draft", { exact: true })).toBeVisible();
+  await page.locator("#workflow-review-draft").fill("Approved result");
+  await page.locator("#workflow-review-note").fill("Checked the facts and required fields.");
+  await reviewDialog.getByRole("button", { name: "Approve and continue" }).click();
+
+  await expect(page.getByRole("status")).toContainText("Workflow completed");
+  await expect(page.locator(".workflow-final-output pre")).toHaveText("Approved result");
+  await expect(page.locator(".workflow-review-result")).toContainText("approve");
+  await expect(page.locator(".workflow-review-result")).toContainText("Checked the facts and required fields.");
+});
