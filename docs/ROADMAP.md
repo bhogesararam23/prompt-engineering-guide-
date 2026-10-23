@@ -35,7 +35,8 @@
 - [x] API test suite.
 - [x] Add explicit opt-in API connection checks, prompt upload, and API-to-browser merge; there is no background sync.
 - [ ] Add conflict-resolution and sync reconciliation tests before expanding synchronization.
-- [ ] Add database migrations, PostgreSQL deployment, authentication, authorization, and rate limits before public hosting.
+- [x] Add optional bearer-token protection for prompt APIs and keep the browser token session-only.
+- [ ] Add database migrations, PostgreSQL deployment, per-user authentication/authorization, tenant isolation, rate limits, and monitoring before public hosting.
 
 ## M5 — Evaluation and content quality
 - [x] Add portable local datasets, deterministic exact-match scoring, and editable test cases.
