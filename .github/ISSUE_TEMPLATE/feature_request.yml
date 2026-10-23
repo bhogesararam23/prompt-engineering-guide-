@@ -1,0 +1,36 @@
+name: Feature request
+description: Propose a focused improvement to learning, prompt construction, evaluation, or local-first behavior.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or learning need
+      description: What task is difficult or currently unsupported?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the smallest useful implementation.
+    validations:
+      required: true
+  - type: dropdown
+    id: network
+    attributes:
+      label: Does this require a network service?
+      options:
+        - "No — browser-only or local deterministic behavior"
+        - "Optional explicit API connection"
+        - "Yes — explain why a network service is essential"
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List observable checks that would demonstrate the feature works.
+    validations:
+      required: true
