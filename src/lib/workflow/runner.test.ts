@@ -55,6 +55,40 @@ describe("workflow runtime", () => {
     expect(result.status).toBe("cancelled");
   });
 
+  it("pauses for a human decision and records an approved edit", async () => {
+    const graph = createLinearWorkflow(["input", "human-review", "output"], "human approval");
+    const review = vi.fn(async (request) => {
+      expect(request.input).toBe("draft output");
+      expect(request.allowEdit).toBe(true);
+      return { approved: true, output: "reviewed output", feedback: "Checked the required fields." };
+    });
+    const result = await runWorkflow(graph, { inputs: { input: "draft output" }, review });
+    expect(result.status).toBe("success");
+    expect(result.output).toBe("reviewed output");
+    const reviewRun = result.nodeRuns.find((node) => node.nodeId.includes("human-review"));
+    expect(reviewRun?.selectedPort).toBe("approve");
+    expect(reviewRun?.review).toEqual({ decision: "approve", note: "Checked the required fields." });
+    expect(review).toHaveBeenCalledTimes(1);
+  });
+
+  it("routes rejected human review through the reject edge", async () => {
+    const graph = createLinearWorkflow(["input", "human-review", "output"], "rejected draft");
+    const result = await runWorkflow(graph, {
+      inputs: { input: "unapproved content" },
+      review: async () => ({ approved: false, feedback: "Missing source evidence." })
+    });
+    expect(result.status).toBe("success");
+    expect(result.output).toBe("unapproved content");
+    expect(result.nodeRuns.find((node) => node.nodeId.includes("human-review"))?.selectedPort).toBe("reject");
+  });
+
+  it("fails clearly if an interactive workflow has no human-review handler", async () => {
+    const graph = createLinearWorkflow(["input", "human-review", "output"], "missing reviewer");
+    const result = await runWorkflow(graph, { inputs: { input: "content" } });
+    expect(result.status).toBe("failed");
+    expect(result.errors.join(" ")).toContain("no review handler");
+  });
+
   it("records a callback after each node settles", async () => {
     const graph: WorkflowDefinition = createLinearWorkflow(["input", "transform", "output"], "trace");
     const onNodeRun = vi.fn();
