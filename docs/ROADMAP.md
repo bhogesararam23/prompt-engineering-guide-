@@ -13,7 +13,8 @@
 - [ ] Run typecheck, unit tests, production build, and a browser smoke test in CI.
 
 ## M2 — Learning and Prompt Lab
-- [x] Foundation and advanced lesson modules with practical examples.
+- [x] Foundation and advanced lesson modules with practical examples and source links.
+- [x] Deterministic, no-model knowledge checks with local attempt history and scoring.
 - [x] Prompt templates and structured prompt fields.
 - [x] Save, copy, search lessons, filter categories, and export/import the prompt library.
 - [x] Compare two saved prompt snapshots using a bounded line-level diff.
