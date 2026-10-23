@@ -108,7 +108,7 @@ test("human review pauses a workflow and forwards approved edits", async ({ page
   const reviewDialog = page.getByRole("dialog");
   await expect(reviewDialog).toBeVisible();
   await expect(reviewDialog.getByRole("heading", { name: "Review release note" })).toBeVisible();
-  await expect(reviewDialog.getByText("Original draft", { exact: true })).toBeVisible();
+  await expect(reviewDialog.locator(".workflow-review-source pre")).toHaveText("Original draft");
   await page.locator("#workflow-review-draft").fill("Approved result");
   await page.locator("#workflow-review-note").fill("Checked the facts and required fields.");
   await reviewDialog.getByRole("button", { name: "Approve and continue" }).click();
