@@ -19,7 +19,8 @@
 - [x] Compare two saved prompt snapshots using a bounded line-level diff.
 - [x] Validate imported prompt records and re-key ID collisions.
 - [x] Add bookmarks, lesson completion progress, and progress persistence tests.
-- [ ] Complete keyboard-navigation review and add import parser tests for duplicate IDs and oversized records.
+- [x] Add prompt import parser validation and duplicate-ID tests.
+- [ ] Complete keyboard-navigation and screen-reader review.
 
 ## M3 — Local inference
 - [x] Isolate WebLLM in a dedicated adapter with explicit load/unload actions.
@@ -46,7 +47,8 @@
 
 ## M6 — Release hardening
 - [x] Add production app-shell caching for repeat offline visits; model weights and API calls are intentionally excluded.
-- [ ] Add end-to-end browser tests and accessibility audit.
+- [x] Add Playwright smoke tests for the production preview: overview, guide search, prompt save/version comparison, and model-free evaluation UI.
+- [ ] Confirm CI passes and complete the keyboard/accessibility audit.
 - [ ] Audit dependencies, licenses, model weights, and actual network traffic.
 - [ ] Test a clean install, mobile layout, local inference, failure recovery, and offline behavior.
 - [ ] Publish reproducible deployment and rollback instructions.
