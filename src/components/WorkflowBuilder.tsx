@@ -113,7 +113,7 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
   };
   const requestHumanReview = (request: HumanReviewRequest, signal?: AbortSignal) => new Promise<HumanReviewDecision>((resolve) => {
     let settled = false;
-    let onAbort = () => undefined;
+    let onAbort: () => void = () => undefined;
     const settle = (decision: HumanReviewDecision) => {
       if (settled) return;
       settled = true;
