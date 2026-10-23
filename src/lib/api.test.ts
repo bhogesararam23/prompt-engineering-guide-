@@ -5,6 +5,21 @@ import type { SavedPrompt } from "./prompts";
 const local: SavedPrompt = { id: "local", title: "Same", content: "A prompt", createdAt: "2026-01-01T00:00:00Z" };
 
 describe("optional API helpers", () => {
+  it("allows an optional bearer token to be attached to protected API requests", async () => {
+    const originalFetch = globalThis.fetch;
+    let sentAuthorization = "";
+    globalThis.fetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
+      sentAuthorization = new Headers(init?.headers).get("Authorization") || "";
+      return new Response(JSON.stringify([]), { status: 200, headers: { "Content-Type": "application/json" } });
+    }) as typeof fetch;
+    try {
+      await listApiPrompts("http://127.0.0.1:8000", "session-token");
+      expect(sentAuthorization).toBe("Bearer session-token");
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
   it("normalizes trailing slashes", () => {
     expect(normalizeApiBase("http://127.0.0.1:8000/")).toBe("http://127.0.0.1:8000");
   });
