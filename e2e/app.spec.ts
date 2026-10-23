@@ -60,7 +60,7 @@ test("advanced techniques are searchable and transfer into Prompt Lab", async ({
   await page.getByRole("button", { name: /Techniques/ }).click();
   await expect(page.getByRole("heading", { name: "Techniques Library" })).toBeVisible();
   await page.getByLabel("SEARCH TECHNIQUES").fill("Graph of Thoughts");
-  const card = page.getByRole("button", { name: /Graph of Thoughts \(research concept\)/ });
+  const card = page.getByRole("button", { name: /Graph of Thoughts \\(research concept\\)/ });
   await expect(card).toBeVisible();
   await expect(page.getByText(/Graph workflow prompting is this product's visual orchestration feature/)).toBeVisible();
   await card.click();
@@ -100,7 +100,7 @@ test("workflow builder runs a deterministic graph without local inference", asyn
 test("human review pauses a workflow and forwards approved edits", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /Graph & loops/ }).click();
-  await page.locator(".workflow-file-button input").setInputFiles("e2e/fixtures/human-review-workflow.json");
+  await page.getByRole("button", { name: "Import JSON" }).locator('input[type="file"]').setInputFiles("e2e/fixtures/human-review-workflow.json");
   await expect(page.getByRole("status")).toContainText("Workflow imported and validated");
   await page.locator("#workflow-input-value").fill("Original draft");
   await page.getByRole("button", { name: "Run workflow" }).click();
@@ -128,7 +128,7 @@ test("workflow evaluation scores the starter graph against the same local datase
   await page.getByRole("button", { name: "Run evaluation" }).click();
   await expect(page.getByRole("status")).toContainText("Evaluation finished: 3/3 cases passed (100.0%)");
   await expect(page.locator(".workflow-eval-result")).toHaveCount(3);
-  await expect(page.locator(".workflow-eval-results")).toContainText("route-summary");
+  await expect(page.locator(".workflow-eval-results")).toContainText("Selected route: match");
   await expect(page.getByRole("button", { name: "Export run JSON" })).toBeVisible();
   await page.getByRole("button", { name: "Save dataset" }).click();
   await expect(page.getByRole("status")).toContainText("dataset saved locally");
