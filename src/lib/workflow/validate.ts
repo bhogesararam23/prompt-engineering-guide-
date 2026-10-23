@@ -3,7 +3,7 @@ import type { WorkflowDefinition, WorkflowIssue, WorkflowNode, WorkflowNodeType 
 export const MAX_WORKFLOW_NODES = 100;
 export const MAX_WORKFLOW_EDGES = 200;
 export const MAX_WORKFLOW_JSON_CHARS = 1_000_000;
-const nodeTypes: WorkflowNodeType[] = ["input", "prompt", "transform", "validator", "router", "merge", "loop", "output"];
+const nodeTypes: WorkflowNodeType[] = ["input", "prompt", "transform", "validator", "router", "merge", "loop", "human-review", "output"];
 
 function record(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -55,6 +55,10 @@ function configIssue(node: WorkflowNode): string | null {
       if (["contains", "equals"].includes(node.config.evaluator) && !string(node.config.expectedValue)) return "This loop evaluator needs an expected value.";
       if (node.config.evaluator === "max-length" && (!finite(node.config.maxLength) || node.config.maxLength < 1 || node.config.maxLength > 100_000)) return "Loop maximum length must be between 1 and 100000.";
       return null;
+    case "human-review":
+      if (!nonEmpty(node.config.instruction)) return "Human-review nodes need an instruction for the reviewer.";
+      if (typeof node.config.allowEdit !== "boolean") return "Human-review nodes must explicitly configure whether the reviewed output can be edited.";
+      return null;
     case "output":
       return null;
   }
@@ -63,6 +67,7 @@ function allowedPorts(node: WorkflowNode): string[] {
   if (node.type === "router") return ["match", "no-match"];
   if (node.type === "validator") return ["pass", "fail"];
   if (node.type === "loop") return ["pass", "limit"];
+  if (node.type === "human-review") return ["approve", "reject"];
   return ["output"];
 }
 
@@ -160,10 +165,12 @@ export function validateWorkflow(value: unknown): WorkflowIssue[] {
     if (!reachable.has(node.id)) issues.push({ code: "unreachable-node", message: `Node “${node.label}” is not reachable from the entry input.`, nodeId: node.id, severity: "warning" });
   }
   for (const node of workflow.nodes) {
-    if ((node.type === "router" || node.type === "validator" || node.type === "loop") && reachable.has(node.id)) {
+    if ((node.type === "router" || node.type === "validator" || node.type === "loop" || node.type === "human-review") && reachable.has(node.id)) {
       const ports = new Set(workflow.edges.filter((edge) => edge.from === node.id).map((edge) => edge.fromPort));
-      if (!ports.has(node.type === "router" ? "match" : node.type === "validator" ? "pass" : "pass") ||
-          !ports.has(node.type === "router" ? "no-match" : node.type === "validator" ? "fail" : "limit")) {
+      const required = node.type === "router" ? ["match", "no-match"] :
+        node.type === "validator" ? ["pass", "fail"] :
+        node.type === "loop" ? ["pass", "limit"] : ["approve", "reject"];
+      if (!required.every((port) => ports.has(port))) {
         issues.push({ code: "unhandled-branch", message: `Node “${node.label}” does not connect all of its result ports. Consider adding a fallback path.`, nodeId: node.id, severity: "warning" });
       }
     }
