@@ -161,7 +161,7 @@ Treat the graph as a typed workflow, not as decorative boxes connected by lines.
 - Each node has a stable ID, node type, label, configuration, and canvas position.
 - Each edge identifies a source node/port and target node/port. Conditional edges contain declarative predicates rather than executable code.
 - Validate missing node IDs, duplicate IDs, missing required fields, invalid references, incompatible ports, unreachable nodes, unresolved branches, invalid output references, and unbounded cycles.
-- The normal execution graph must be acyclic. A cycle is valid only when it passes through a Loop Controller with a finite maximum-iteration limit. No other cycle may execute.
+- For v1, the visible edge graph is always acyclic. Repeat/refine behavior is encapsulated inside a Loop Controller, which owns the iteration counter and enforces its finite maximum. Do not create visible cycle edges in the first release.
 - Reject imported graphs that exceed documented size limits or violate schema rules.
 - Show errors on the relevant nodes and edges and provide a plain-language explanation plus a proposed repair. Do not silently mutate an invalid graph.
 - Support topological execution for acyclic portions, deterministic branch outcomes, merge rules, cancellation, and partial-run inspection.
