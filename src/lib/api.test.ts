@@ -12,6 +12,13 @@ describe("optional API helpers", () => {
     expect(() => normalizeApiBase("javascript:alert(1)")).toThrow(/HTTP or HTTPS/);
     expect(() => normalizeApiBase("https://user:pass@example.com")).toThrow(/credentials/);
   });
+  it("deduplicates duplicate entries returned by the remote API", () => {
+    const remote = [
+      { id: "remote-1", title: "New", content: "Unique", created_at: "2026-01-01T00:00:00Z" },
+      { id: "remote-2", title: "New", content: "Unique", created_at: "2026-01-02T00:00:00Z" }
+    ];
+    expect(mergeApiPrompts([], remote)).toHaveLength(1);
+  });
   it("merges by title and content while preserving local records", () => {
     const remote = [
       { id: "remote-1", title: "Same", content: "A prompt", created_at: "2026-01-01T00:00:00Z" },
