@@ -105,6 +105,7 @@ export async function runWorkflow(
           if (!options.generate) throw new Error("This workflow requires local inference, but no local-model generator is available.");
           const prompt = fillTemplate(node.config.template, input, inputValues);
           output = await options.generate(prompt, node.config.systemPrompt, options.signal);
+          throwIfAborted(options.signal);
           break;
         }
         case "transform": {
@@ -152,6 +153,7 @@ export async function runWorkflow(
               "Return the artifact only."
             ].filter(Boolean).join("\n\n");
             candidate = await options.generate(prompt, "Follow the task and acceptance criteria. Do not invent a passing result.", options.signal);
+            throwIfAborted(options.signal);
             passed = evaluate(candidate, node.config.evaluator, node.config.expectedValue, node.config.maxLength);
             const deterministicFeedback = passed ? "Deterministic acceptance check passed." :
               "Deterministic acceptance check failed: " + node.config.evaluator +
@@ -186,6 +188,7 @@ export async function runWorkflow(
             input,
             allowEdit: node.config.allowEdit
           }, options.signal);
+          throwIfAborted(options.signal);
           if (decision.cancelled) {
             const error = new Error("Workflow execution was cancelled during human review.");
             error.name = "AbortError";
