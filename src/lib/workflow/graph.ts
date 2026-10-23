@@ -74,6 +74,15 @@ export function createStarterWorkflow(name = "Branch and merge starter"): Workfl
     { ...createNode("merge", 4), id: "merge-1", label: "Merge selected branch", config: { strategy: "first-non-empty" } },
     { ...createNode("output", 5), id: "output-1", label: "Result" }
   ];
+  const starterPositions: Record<string, { x: number; y: number }> = {
+    "input-1": { x: 28, y: 100 },
+    "router-1": { x: 280, y: 100 },
+    "transform-1": { x: 540, y: 22 },
+    "merge-1": { x: 540, y: 180 },
+    "output-1": { x: 800, y: 100 }
+  };
+  for (const node of nodes) node.position = starterPositions[node.id] || node.position;
+
   const edges: WorkflowEdge[] = [
     { id: "edge-1", from: "input-1", to: "router-1" },
     { id: "edge-2", from: "router-1", to: "transform-1", fromPort: "match" },
