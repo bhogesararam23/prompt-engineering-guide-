@@ -118,3 +118,18 @@ test("human review pauses a workflow and forwards approved edits", async ({ page
   await expect(page.locator(".workflow-review-result")).toContainText("approve");
   await expect(page.locator(".workflow-review-result")).toContainText("Checked the facts and required fields.");
 });
+
+
+test("workflow evaluation scores the starter graph against the same local dataset", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Graph & loops/ }).click();
+  await expect(page.getByRole("heading", { name: "Workflow Evaluation" })).toBeVisible();
+  await expect(page.locator(".workflow-eval-case")).toHaveCount(3);
+  await page.getByRole("button", { name: "Run evaluation" }).click();
+  await expect(page.getByRole("status")).toContainText("Evaluation finished: 3/3 cases passed (100.0%)");
+  await expect(page.locator(".workflow-eval-result")).toHaveCount(3);
+  await expect(page.locator(".workflow-eval-results")).toContainText("route-summary");
+  await expect(page.getByRole("button", { name: "Export run JSON" })).toBeVisible();
+  await page.getByRole("button", { name: "Save dataset" }).click();
+  await expect(page.getByRole("status")).toContainText("dataset saved locally");
+});
