@@ -123,8 +123,8 @@ describe("workflow runtime", () => {
 
     expect(result.status).toBe("success");
     expect(peakConcurrency).toBe(2);
-    expect(result.output).toBe("A result\\n\\nB result");
-    expect(result.nodeRuns.find((node) => node.nodeId === "merge-4")?.output).toBe("A result\\n\\nB result");
+    expect(result.output).toBe("A result\n\nB result");
+    expect(result.nodeRuns.find((node) => node.nodeId === "merge-4")?.output).toBe("A result\n\nB result");
   });
 
   it("serializes concurrent generator requests by default for single-worker local models", async () => {
@@ -155,7 +155,7 @@ describe("workflow runtime", () => {
 
     expect(result.status).toBe("success");
     expect(peakConcurrency).toBe(1);
-    expect(result.output).toBe("A result\\n\\nB result");
+    expect(result.output).toBe("A result\n\nB result");
   });
 
   it("records a callback after each node settles", async () => {
