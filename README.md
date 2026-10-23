@@ -6,7 +6,7 @@ A local-first learning guide and prompt workbench. Learn practical prompting tec
 
 ## Features
 
-- Eight structured lesson modules from foundations through context engineering, evaluation, and prompt security, with authoritative references.
+- Eight source-linked learning modules with examples and deterministic knowledge checks whose attempts are saved locally.
 - Prompt Lab for role, task, context, examples, input, constraints, and output format.
 - Deterministic prompt assembly and basic validation; previews do not call an LLM.
 - An evaluation bench with editable test cases, exact-match scoring, locally generated outputs, cancellation, export/import, and saved prompt/dataset snapshots.
