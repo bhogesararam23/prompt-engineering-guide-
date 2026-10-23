@@ -14,6 +14,14 @@ describe("optional API helpers", () => {
     expect(() => normalizeApiBase("http://api.example.com")).toThrow(/HTTPS for remote/);
     expect(normalizeApiBase("http://127.0.0.1:8000")).toBe("http://127.0.0.1:8000");
   });
+  it("rekeys remote IDs that collide with local prompts", () => {
+    const localPrompt = { id: "same-id", title: "Local", content: "Keep me", createdAt: "2026-01-01T00:00:00Z" };
+    const remote = [{ id: "same-id", title: "Remote", content: "Distinct", created_at: "2026-01-02T00:00:00Z" }];
+    const merged = mergeApiPrompts([localPrompt], remote);
+    expect(new Set(merged.map((item) => item.id)).size).toBe(2);
+    expect(merged[1]).toEqual(localPrompt);
+  });
+
   it("deduplicates duplicate entries returned by the remote API", () => {
     const remote = [
       { id: "remote-1", title: "New", content: "Unique", created_at: "2026-01-01T00:00:00Z" },
