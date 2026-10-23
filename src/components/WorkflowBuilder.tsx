@@ -384,8 +384,9 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
                 const y1 = from.position.y + 48;
                 const x2 = to.position.x;
                 const y2 = to.position.y + 48;
-                const bend = Math.max(38, Math.abs(x2 - x1) * 0.45);
-                const path = `M ${x1} ${y1} C ${x1 + bend} ${y1}, ${x2 - bend} ${y2}, ${x2} ${y2}`;
+                const bend = Math.max(38, Math.min(120, Math.abs(x2 - x1) * 0.45));
+                const curveOffset = (y2 >= y1 ? 1 : -1) * Math.max(12, Math.min(42, Math.abs(y2 - y1) * 0.25));
+                const path = `M ${x1} ${y1} C ${x1 + bend} ${y1 + curveOffset}, ${x2 - bend} ${y2 - curveOffset}, ${x2} ${y2}`;
                 return <path key={edge.id} className="workflow-canvas-edge" d={path} markerEnd="url(#workflow-arrow)" />;
               })}
             </svg>
