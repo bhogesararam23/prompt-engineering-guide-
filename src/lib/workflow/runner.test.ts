@@ -39,9 +39,11 @@ describe("workflow runtime", () => {
     }
     const generate = vi.fn(async (prompt: string) => prompt.startsWith("Create") ? "draft" : "revised");
     const result = await runWorkflow(graph, { inputs: { input: "source" }, generate });
-    expect(result.status).toBe("success");
+    expect(result.status).toBe("failed");
+    expect(result.errors.join(" ")).toContain("without passing the deterministic acceptance check");
     expect(result.nodeRuns.find((node) => node.nodeId === loop?.id)?.iterations).toHaveLength(3);
     expect(result.nodeRuns.find((node) => node.nodeId === loop?.id)?.selectedPort).toBe("limit");
+    expect(result.nodeRuns.find((node) => node.nodeId === loop?.id)?.iterations?.[0].feedback).toContain("Reviewer feedback:");
     expect(generate).toHaveBeenCalledTimes(5);
   });
 
