@@ -82,7 +82,7 @@ export function createStarterWorkflow(name = "Branch and merge starter"): Workfl
     { id: "edge-5", from: "merge-1", to: "output-1" }
   ];
   const now = new Date().toISOString();
-  return { schemaVersion: 1, id: "starter-branch-merge", name, description: "A local-first example that routes text, applies a deterministic transform on one path, and merges into an output.", entryNodeId: "input-1", nodes, edges, createdAt: now, updatedAt: now };
+  return { schemaVersion: 1, id: "starter-branch-merge-" + now.replace(/\\D/g, "").slice(0, 14), name, description: "A local-first example that routes text, applies a deterministic transform on one path, and merges into an output.", entryNodeId: "input-1", nodes, edges, createdAt: now, updatedAt: now };
 }
 
 export function createLinearWorkflow(types: WorkflowNodeType[], name: string): WorkflowDefinition {
