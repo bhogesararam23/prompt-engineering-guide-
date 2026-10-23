@@ -1,5 +1,5 @@
 import type { WorkflowDefinition, WorkflowEdge, WorkflowNode, WorkflowNodeRun, WorkflowRun } from "./types";
-import { topologicalOrder } from "./graph";
+import { reachableNodeIds, topologicalOrder } from "./graph";
 import { validateWorkflow, workflowHasErrors } from "./validate";
 
 export type WorkflowInputs = Record<string, string>;
@@ -62,7 +62,8 @@ export async function runWorkflow(
   const issues = validateWorkflow(workflow);
   const fatalIssues = issues.filter((item) => item.severity === "error");
   if (workflowHasErrors(issues)) throw new Error("Cannot execute invalid workflow: " + fatalIssues.map((item) => item.message).join(" "));
-  const order = topologicalOrder(workflow);
+  const reachable = reachableNodeIds(workflow);
+  const order = topologicalOrder(workflow).filter((nodeId) => reachable.has(nodeId));
   const nodeById = new Map(workflow.nodes.map((node) => [node.id, node]));
   const runs = new Map<string, WorkflowNodeRun>();
   const errors: string[] = [];
@@ -148,20 +149,22 @@ export async function runWorkflow(
             ].filter(Boolean).join("\n\n");
             candidate = await options.generate(prompt, "Follow the task and acceptance criteria. Do not invent a passing result.", options.signal);
             passed = evaluate(candidate, node.config.evaluator, node.config.expectedValue, node.config.maxLength);
-            feedback = passed ? "Deterministic acceptance check passed." :
+            const deterministicFeedback = passed ? "Deterministic acceptance check passed." :
               "Deterministic acceptance check failed: " + node.config.evaluator +
               (node.config.expectedValue !== undefined ? " (expected " + JSON.stringify(node.config.expectedValue) + ")" : "") +
               (node.config.maxLength !== undefined ? " (maximum length " + node.config.maxLength + ")" : "");
+            feedback = deterministicFeedback;
             if (!passed && attempt < node.config.maxIterations) {
               const reviewPrompt = [
                 node.config.reviewInstruction,
                 "Candidate:",
                 candidate,
                 "Deterministic check:",
-                feedback,
+                deterministicFeedback,
                 "Give specific actionable revision feedback. Do not claim the deterministic check passed."
               ].join("\n\n");
-              feedback = await options.generate(reviewPrompt, "Review the candidate critically against the stated criteria.", options.signal);
+              const reviewerFeedback = await options.generate(reviewPrompt, "Review the candidate critically against the stated criteria.", options.signal);
+              feedback = deterministicFeedback + "\nReviewer feedback: " + reviewerFeedback;
             }
             iterations.push({ attempt, candidate, passed, feedback });
             if (passed) break;
@@ -179,6 +182,9 @@ export async function runWorkflow(
       const completed: WorkflowNodeRun = { nodeId, status: "success", input, output, durationMs: Date.now() - start, ...(selectedPort ? { selectedPort } : {}), ...(iterations ? { iterations } : {}) };
       runs.set(nodeId, completed);
       options.onNodeRun?.(completed);
+      if (node.type === "loop" && selectedPort === "limit") {
+        errors.push(node.label + ": reached the maximum of " + node.config.maxIterations + " iterations without passing the deterministic acceptance check.");
+      }
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") { wasCancelled = true; break; }
       const message = error instanceof Error ? error.message : "Unknown node failure.";
