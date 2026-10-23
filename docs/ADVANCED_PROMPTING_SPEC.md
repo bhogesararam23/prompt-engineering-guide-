@@ -161,7 +161,7 @@ Treat the graph as a typed workflow, not as decorative boxes connected by lines.
 - Each node has a stable ID, node type, label, configuration, and canvas position.
 - Each edge identifies a source node/port and target node/port. Conditional edges contain declarative predicates rather than executable code.
 - Validate missing node IDs, duplicate IDs, missing required fields, invalid references, incompatible ports, unreachable nodes, unresolved branches, invalid output references, and unbounded cycles.
-- The normal execution graph must be acyclic. A cycle is valid only when it passes through a Loop Controller with a finite maximum-iteration limit. No other cycle may execute.
+- For v1, the visible edge graph is always acyclic. Repeat/refine behavior is encapsulated inside a Loop Controller, which owns the iteration counter and enforces its finite maximum. Do not create visible cycle edges in the first release.
 - Reject imported graphs that exceed documented size limits or violate schema rules.
 - Show errors on the relevant nodes and edges and provide a plain-language explanation plus a proposed repair. Do not silently mutate an invalid graph.
 - Support topological execution for acyclic portions, deterministic branch outcomes, merge rules, cancellation, and partial-run inspection.
@@ -368,11 +368,13 @@ The first release of this addition is acceptable only when:
 3. A user can design a loop with a clear finite maximum and see every attempt plus the final stop reason.
 4. A user can create, connect, validate, save, reload, and export a workflow graph.
 5. Unbounded cycles, missing references, duplicate IDs, invalid ports, malformed imports, and over-limit inputs are rejected with useful errors.
-6. Deterministic nodes execute without loading a model. Model-backed nodes do not run until the user explicitly loads the local model.
-7. There are no hosted LLM API calls, API key fields, provider SDKs, background cloud sync, or new mandatory backend dependencies.
-8. Workflow changes are covered by unit tests; major user journeys are covered by Playwright tests.
-9. Evaluation labels make it clear whether results came from deterministic checks, a human, or a model-based reviewer.
-10. The user can inspect and export run traces without needing a cloud account.
+6. Human review pauses the run until an explicit approve/reject decision; optional reviewer edits and the decision note are captured, and cancellation resolves the paused run.
+7. Workflow evaluation compares fixed local cases with explicit match rules, stores workflow/dataset snapshots, exposes per-case outputs, and refuses unattended execution of human-review graphs.
+8. Deterministic nodes execute without loading a model. Model-backed nodes do not run until the user explicitly loads the local model.
+9. There are no hosted LLM API calls, API key fields, provider SDKs, background cloud sync, or new mandatory backend dependencies.
+10. Workflow changes are covered by unit tests; major user journeys are covered by Playwright tests.
+11. Evaluation labels make it clear whether results came from deterministic checks, a human, or a model-based reviewer.
+12. The user can inspect and export run traces without needing a cloud account.
 
 ## 11. Reference list
 

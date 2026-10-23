@@ -3,27 +3,46 @@ name: Quality checks
 on:
   push:
     branches: ["main", "rebuild/**"]
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
   pull_request:
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   frontend:
     runs-on: ubuntu-latest
+    # This image already contains Chromium and its Linux libraries, avoiding
+    # repeated apt installs and browser downloads on every CI run.
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Cache npm download artifacts
+        uses: actions/cache@v4
         with:
-          node-version: 22
-      - run: npm install
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+      - name: Install frontend dependencies
+        run: npm install --no-audit --no-fund
       - run: npm run check:local-first
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
-      - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
 
   backend:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     env:
       PYTHONPATH: .
     steps:
@@ -31,6 +50,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: python -m pip install --upgrade pip
-      - run: pip install -r backend/requirements.txt
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: Install backend dependencies
+        run: python -m pip install --disable-pip-version-check --no-warn-script-location -r backend/requirements.txt
       - run: pytest backend/tests

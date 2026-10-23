@@ -7,6 +7,12 @@ A local-first learning guide and prompt workbench. Learn practical prompting tec
 ## Features
 
 - Eight source-linked learning modules with examples and deterministic knowledge checks whose attempts are saved locally.
+- Advanced Techniques Library with 12 sourced technique cards covering prompt structure, few-shot prompting, chaining, bounded refinement, evaluation flywheels, routing, parallel aggregation, graph workflows, and Graph of Thoughts research.
+- Graph & Loop Builder with a draggable canvas, SVG connections, coordinate editing, auto-arrange, undo/redo, an accessible Outline mode, typed node configuration, graph diagnostics, and validated local JSON import/export.
+- Workflow execution with deterministic input, transformation, validation, routing, merge, output, and human-review nodes. Human review pauses for an explicit approve/reject decision, can accept a reviewed edit, and records a decision note.
+- Prompt and bounded loop nodes require the explicitly loaded local model; no hosted LLM API is configured.
+- A workflow Evaluation Bench with editable datasets, exact/contains/non-empty match rules, per-case outputs, workflow/dataset snapshots, progress and cancellation, local run history, and dataset/run JSON export/import. Human-review workflows cannot be evaluated unattended.
+- Bounded self-correction nodes with a hard limit of 1–10 attempts, deterministic acceptance checks, visible iteration traces, cancellation, and local run history.
 - Prompt Lab for role, task, context, examples, input, constraints, and output format.
 - Deterministic prompt assembly and basic validation; previews do not call an LLM.
 - An evaluation bench with editable test cases, exact-match scoring, locally generated outputs, cancellation, export/import, and saved prompt/dataset snapshots.
@@ -56,7 +62,7 @@ The API stores prompts in a local SQLite database and provides health and determ
 - docs/ARCHITECTURE.md — application boundaries and data flow.
 - docs/BACKEND.md — backend setup and endpoint reference.
 - docs/ROADMAP.md — milestones, exit gates, and known unfinished work.
-- docs/ADVANCED_PROMPTING_SPEC.md — sourced specification for iterative/looped prompts, graph workflows, provider-inspired techniques, execution rules, tests, and implementation phases.
+- docs/ADVANCED_PROMPTING_SPEC.md — source-linked specification for advanced techniques, loop behavior, workflow graph semantics, safety, and release criteria.
 - SECURITY.md — data handling and security expectations.
 - CONTRIBUTING.md — development and contribution workflow.
 

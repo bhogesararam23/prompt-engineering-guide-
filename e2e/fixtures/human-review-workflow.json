@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "e2e-human-review-workflow",
+  "name": "Human approval workflow",
+  "description": "A model-free test of the approval gate.",
+  "entryNodeId": "input-1",
+  "nodes": [
+    {
+      "id": "input-1",
+      "type": "input",
+      "label": "Input",
+      "position": { "x": 28, "y": 100 },
+      "config": { "key": "input", "defaultValue": "" }
+    },
+    {
+      "id": "review-1",
+      "type": "human-review",
+      "label": "Review release note",
+      "position": { "x": 300, "y": 100 },
+      "config": {
+        "instruction": "Check the text for correctness and approve it only if it is acceptable.",
+        "allowEdit": true
+      }
+    },
+    {
+      "id": "output-1",
+      "type": "output",
+      "label": "Final output",
+      "position": { "x": 570, "y": 100 },
+      "config": { "displayName": "Approved result" }
+    }
+  ],
+  "edges": [
+    { "id": "edge-1", "from": "input-1", "to": "review-1" },
+    { "id": "edge-2", "from": "review-1", "to": "output-1", "fromPort": "approve" },
+    { "id": "edge-3", "from": "review-1", "to": "output-1", "fromPort": "reject" }
+  ],
+  "createdAt": "2026-10-23T00:00:00.000Z",
+  "updatedAt": "2026-10-23T00:00:00.000Z"
+}

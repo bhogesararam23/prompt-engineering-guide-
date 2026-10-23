@@ -53,3 +53,83 @@ test("evaluation bench and dataset controls work without loading a model", async
   await expect(page.getByRole("button", { name: "Run evaluation locally" })).toBeDisabled();
   await expect(page.getByRole("button", { name: /Export dataset/ })).toBeVisible();
 });
+
+
+test("advanced techniques are searchable and transfer into Prompt Lab", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Techniques/ }).click();
+  await expect(page.getByRole("heading", { name: "Techniques Library" })).toBeVisible();
+  await page.getByLabel("SEARCH TECHNIQUES").fill("Graph of Thoughts");
+  const card = page.getByRole("button", { name: /Graph of Thoughts \(research concept\)/ });
+  await expect(card).toBeVisible();
+  await expect(page.getByText(/Graph workflow prompting is this product's visual orchestration feature/)).toBeVisible();
+  await card.click();
+  await page.getByRole("button", { name: /Use in Prompt Lab/ }).click();
+  await expect(page.getByRole("heading", { name: "Prompt Lab" })).toBeVisible();
+  await expect(page.locator("#field-title")).toHaveValue("Graph of Thoughts (research concept)");
+});
+
+test("workflow builder runs a deterministic graph without local inference", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Graph & loops/ }).click();
+  await expect(page.getByRole("heading", { name: "Graph & Loop Builder" })).toBeVisible();
+  await expect(page.getByRole("group", { name: "Workflow editor view" })).toBeVisible();
+  await page.getByRole("button", { name: "Outline" }).click();
+  await expect(page.locator(".workflow-node-list")).toBeVisible();
+  await page.getByRole("button", { name: "Canvas" }).click();
+  await expect(page.locator(".workflow-canvas")).toBeVisible();
+  await expect(page.locator(".workflow-canvas-edge").first()).toBeVisible();
+  await expect(page.getByText("Graph structure valid")).toBeVisible();
+  await expect(page.locator("#workflow-position-x")).toBeVisible();
+  await page.getByRole("button", { name: /Add node/ }).click();
+  await expect(page.locator(".workflow-status-strip")).toContainText("6 nodes");
+  await page.getByRole("button", { name: "Undo" }).click();
+  await expect(page.locator(".workflow-status-strip")).toContainText("5 nodes");
+  await page.getByRole("button", { name: "Redo" }).click();
+  await expect(page.locator(".workflow-status-strip")).toContainText("6 nodes");
+  await page.getByRole("button", { name: "Undo" }).click();
+  await expect(page.locator(".workflow-status-strip")).toContainText("5 nodes");
+  await page.getByRole("button", { name: "Run workflow" }).click();
+  await expect(page.getByRole("status")).toContainText("Workflow completed");
+  await expect(page.getByText("Please summarize this document.", { exact: true }).last()).toBeVisible();
+  await page.getByRole("button", { name: "Save locally" }).click();
+  await expect(page.getByRole("status")).toContainText("Workflow saved to this browser");
+});
+
+
+test("human review pauses a workflow and forwards approved edits", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Graph & loops/ }).click();
+  await page.locator('.workflow-toolbar-actions .workflow-file-button input[type="file"]').setInputFiles("e2e/fixtures/human-review-workflow.json");
+  await expect(page.getByRole("status")).toContainText("Workflow imported and validated");
+  await page.locator("#workflow-input-value").fill("Original draft");
+  await page.getByRole("button", { name: "Run workflow" }).click();
+
+  const reviewDialog = page.getByRole("dialog");
+  await expect(reviewDialog).toBeVisible();
+  await expect(reviewDialog.getByRole("heading", { name: "Review release note" })).toBeVisible();
+  await expect(reviewDialog.locator(".workflow-review-source pre")).toHaveText("Original draft");
+  await page.locator("#workflow-review-draft").fill("Approved result");
+  await page.locator("#workflow-review-note").fill("Checked the facts and required fields.");
+  await reviewDialog.getByRole("button", { name: "Approve and continue" }).click();
+
+  await expect(page.getByRole("status")).toContainText("Workflow completed");
+  await expect(page.locator(".workflow-final-output pre")).toHaveText("Approved result");
+  await expect(page.locator(".workflow-review-result")).toContainText("approve");
+  await expect(page.locator(".workflow-review-result")).toContainText("Checked the facts and required fields.");
+});
+
+
+test("workflow evaluation scores the starter graph against the same local dataset", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Graph & loops/ }).click();
+  await expect(page.getByRole("heading", { name: "Workflow Evaluation" })).toBeVisible();
+  await expect(page.locator(".workflow-eval-case")).toHaveCount(3);
+  await page.getByRole("button", { name: "Run evaluation" }).click();
+  await expect(page.getByRole("status")).toContainText("Evaluation finished: 3/3 cases passed (100.0%)");
+  await expect(page.locator(".workflow-eval-result")).toHaveCount(3);
+  await expect(page.locator(".workflow-eval-results")).toContainText("Selected route: match");
+  await expect(page.getByRole("button", { name: "Export run JSON" })).toBeVisible();
+  await page.getByRole("button", { name: "Save dataset" }).click();
+  await expect(page.getByRole("status")).toContainText("dataset saved locally");
+});
