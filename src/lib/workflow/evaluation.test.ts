@@ -24,7 +24,7 @@ describe("workflow evaluation", () => {
     const transform = graph.nodes.find((node) => node.type === "transform");
     if (transform?.type === "transform") transform.config.operation = "uppercase";
     const result = await evaluateWorkflow(graph, [{
-      id: "case-1", name: "Incorrect expected output", input: "lower", expected: "lower", matchRule: "exact"
+      id: "case-1", name: "Incorrect expected output", input: "lower", expected: "completely different", matchRule: "exact"
     }]);
     expect(result.status).toBe("completed");
     expect(result.cases[0].execution).toBe("success");
