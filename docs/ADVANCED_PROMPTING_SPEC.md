@@ -1,8 +1,8 @@
 # Advanced Prompting and Workflow Builder — Product Specification
 
-**Status:** Proposed; documentation phase only  
+**Status:** Partially implemented; not yet release-ready  
 **Last reviewed:** 2026-10-23  
-**Scope:** Product behavior, content, architecture, milestones, and acceptance criteria. This document does not claim that the new UI or workflow runtime has been implemented.
+**Scope:** Product behavior, content, architecture, milestones, and acceptance criteria. The first implementation is merged to main; use docs/ROADMAP.md and docs/RELEASE_CHECKLIST.md for implemented areas and remaining release gates.
 
 ## 1. Purpose
 
@@ -306,8 +306,9 @@ The sketch is illustrative. Implementation must define complete discriminated Ty
 - [x] Research official OpenAI, Anthropic, and Google prompting guidance.
 - [x] Separate provider-documented patterns from the product’s own terminology.
 - [x] Specify looped prompting, graph workflow semantics, privacy, evaluation, and acceptance criteria.
-- [ ] Review this spec before implementation.
-- [ ] Confirm no external provider inference or new required backend is introduced.
+- [x] Review the terminology, architecture boundaries, and non-goals before implementation.
+- [x] Confirm the implementation does not require hosted provider inference or a new mandatory backend.
+- [ ] Re-review this specification against the implementation before release.
 
 **Exit gate:** decisions, terminology, first-release scope, and non-goals are accepted.
 

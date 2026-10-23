@@ -12,6 +12,10 @@ export type WorkflowRunOptions = {
   review?: (request: HumanReviewRequest, signal?: AbortSignal) => Promise<HumanReviewDecision>;
   signal?: AbortSignal;
   onNodeRun?: (run: WorkflowNodeRun) => void;
+  /** Set false only when the supplied generator is safe for concurrent requests. Defaults to serial. */
+  serializeGenerate?: boolean;
+  /** Set false only when the review handler supports simultaneous reviews. Defaults to serial. */
+  serializeReview?: boolean;
 };
 
 function throwIfAborted(signal?: AbortSignal): void {
@@ -58,6 +62,32 @@ function createRunId(): string {
   return typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : "run-" + Date.now().toString(36);
 }
 
+function serializeGenerator(generator?: LocalGenerate): LocalGenerate | undefined {
+  if (!generator) return undefined;
+  let tail: Promise<void> = Promise.resolve();
+  return (prompt, systemPrompt, signal) => {
+    const request = tail.then(() => {
+      throwIfAborted(signal);
+      return generator(prompt, systemPrompt, signal);
+    });
+    tail = request.then(() => undefined, () => undefined);
+    return request;
+  };
+}
+
+function serializeReview(review?: WorkflowRunOptions["review"]): WorkflowRunOptions["review"] {
+  if (!review) return undefined;
+  let tail: Promise<void> = Promise.resolve();
+  return (request, signal) => {
+    const decision = tail.then(() => {
+      throwIfAborted(signal);
+      return review(request, signal);
+    });
+    tail = decision.then(() => undefined, () => undefined);
+    return decision;
+  };
+}
+
 export async function runWorkflow(
   workflow: WorkflowDefinition,
   options: WorkflowRunOptions = {}
@@ -69,15 +99,18 @@ export async function runWorkflow(
   const order = topologicalOrder(workflow).filter((nodeId) => reachable.has(nodeId));
   const nodeById = new Map(workflow.nodes.map((node) => [node.id, node]));
   const runs = new Map<string, WorkflowNodeRun>();
-  const errors: string[] = [];
+  const nodeErrors = new Map<string, string[]>();
+  const recordNodeError = (nodeId: string, message: string) => nodeErrors.set(nodeId, [...(nodeErrors.get(nodeId) || []), message]);
   const outputs: string[] = [];
   const startedAt = new Date().toISOString();
   let wasCancelled = false;
+  const generate = options.serializeGenerate === false ? options.generate : serializeGenerator(options.generate);
+  const reviewHandler = options.serializeReview === false ? options.review : serializeReview(options.review);
 
-  for (const nodeId of order) {
-    if (options.signal?.aborted) { wasCancelled = true; break; }
+  const executeNode = async (nodeId: string): Promise<void> => {
+    if (options.signal?.aborted) { wasCancelled = true; return; }
     const node = nodeById.get(nodeId);
-    if (!node) continue;
+    if (!node) return;
     const start = Date.now();
     const incomingEdges = workflow.edges.filter((edge) => edge.to === nodeId);
     const incoming = activeIncoming(workflow.edges, nodeId, runs);
@@ -88,7 +121,7 @@ export async function runWorkflow(
       const skipped: WorkflowNodeRun = { nodeId, status: "skipped", input: "", output: "", durationMs: Date.now() - start };
       runs.set(nodeId, skipped);
       options.onNodeRun?.(skipped);
-      continue;
+      return;
     }
 
     try {
@@ -102,9 +135,9 @@ export async function runWorkflow(
           break;
         }
         case "prompt": {
-          if (!options.generate) throw new Error("This workflow requires local inference, but no local-model generator is available.");
+          if (!generate) throw new Error("This workflow requires local inference, but no local-model generator is available.");
           const prompt = fillTemplate(node.config.template, input, inputValues);
-          output = await options.generate(prompt, node.config.systemPrompt, options.signal);
+          output = await generate(prompt, node.config.systemPrompt, options.signal);
           throwIfAborted(options.signal);
           break;
         }
@@ -134,7 +167,7 @@ export async function runWorkflow(
           break;
         }
         case "loop": {
-          if (!options.generate) throw new Error("A bounded prompt loop needs the explicitly loaded local model.");
+          if (!generate) throw new Error("A bounded prompt loop needs the explicitly loaded local model.");
           iterations = [];
           let candidate = "";
           let feedback = "";
@@ -152,7 +185,7 @@ export async function runWorkflow(
               node.config.reviewInstruction,
               "Return the artifact only."
             ].filter(Boolean).join("\n\n");
-            candidate = await options.generate(prompt, "Follow the task and acceptance criteria. Do not invent a passing result.", options.signal);
+            candidate = await generate(prompt, "Follow the task and acceptance criteria. Do not invent a passing result.", options.signal);
             throwIfAborted(options.signal);
             passed = evaluate(candidate, node.config.evaluator, node.config.expectedValue, node.config.maxLength);
             const deterministicFeedback = passed ? "Deterministic acceptance check passed." :
@@ -169,7 +202,7 @@ export async function runWorkflow(
                 deterministicFeedback,
                 "Give specific actionable revision feedback. Do not claim the deterministic check passed."
               ].join("\n\n");
-              const reviewerFeedback = await options.generate(reviewPrompt, "Review the candidate critically against the stated criteria.", options.signal);
+              const reviewerFeedback = await generate(reviewPrompt, "Review the candidate critically against the stated criteria.", options.signal);
               feedback = deterministicFeedback + "\nReviewer feedback: " + reviewerFeedback;
             }
             iterations.push({ attempt, candidate, passed, feedback });
@@ -180,8 +213,8 @@ export async function runWorkflow(
           break;
         }
         case "human-review": {
-          if (!options.review) throw new Error("This workflow requires an explicit human-review decision, but no review handler is available.");
-          const decision = await options.review({
+          if (!reviewHandler) throw new Error("This workflow requires an explicit human-review decision, but no review handler is available.");
+          const decision = await reviewHandler({
             nodeId: node.id,
             label: node.label,
             instruction: node.config.instruction,
@@ -209,7 +242,7 @@ export async function runWorkflow(
       runs.set(nodeId, completed);
       options.onNodeRun?.(completed);
       if (node.type === "loop" && selectedPort === "limit") {
-        errors.push(node.label + ": reached the maximum of " + node.config.maxIterations + " iterations without passing the deterministic acceptance check.");
+        recordNodeError(nodeId, node.label + ": reached the maximum of " + node.config.maxIterations + " iterations without passing the deterministic acceptance check.");
       }
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") {
@@ -217,15 +250,46 @@ export async function runWorkflow(
         runs.set(nodeId, cancelled);
         options.onNodeRun?.(cancelled);
         wasCancelled = true;
-        break;
+        return;
       }
       const message = error instanceof Error ? error.message : "Unknown node failure.";
       const failed: WorkflowNodeRun = { nodeId, status: "failed", input, output: "", durationMs: Date.now() - start, error: message };
       runs.set(nodeId, failed);
-      errors.push(node.label + ": " + message);
+      recordNodeError(nodeId, node.label + ": " + message);
       options.onNodeRun?.(failed);
     }
+  };
+
+  // Execute independent nodes in the same DAG frontier concurrently. Dependency
+  // edges are released only after every node in the current frontier settles.
+  const rank = new Map(order.map((nodeId, index) => [nodeId, index]));
+  const remainingDependencies = new Map(order.map((nodeId) => [nodeId, 0]));
+  const outgoing = new Map(order.map((nodeId) => [nodeId, [] as string[]]));
+  for (const edge of workflow.edges) {
+    if (!reachable.has(edge.from) || !reachable.has(edge.to)) continue;
+    remainingDependencies.set(edge.to, (remainingDependencies.get(edge.to) || 0) + 1);
+    outgoing.get(edge.from)?.push(edge.to);
   }
+
+  let ready = order.filter((nodeId) => (remainingDependencies.get(nodeId) || 0) === 0);
+  while (ready.length) {
+    if (options.signal?.aborted) { wasCancelled = true; break; }
+    const wave = ready;
+    await Promise.all(wave.map((nodeId) => executeNode(nodeId)));
+    if (wasCancelled || options.signal?.aborted) { wasCancelled = true; break; }
+
+    const nextReady: string[] = [];
+    for (const nodeId of wave) {
+      for (const targetId of outgoing.get(nodeId) || []) {
+        const remaining = (remainingDependencies.get(targetId) || 0) - 1;
+        remainingDependencies.set(targetId, remaining);
+        if (remaining === 0) nextReady.push(targetId);
+      }
+    }
+    ready = [...new Set(nextReady)].sort((left, right) => (rank.get(left) ?? 0) - (rank.get(right) ?? 0));
+  }
+
+  const errors = order.flatMap((nodeId) => nodeErrors.get(nodeId) || []);
 
   const nodeRuns = order.flatMap((id) => runs.has(id) ? [runs.get(id)!] : []);
   const outputNodeRuns = workflow.nodes.filter((node) => node.type === "output").map((node) => runs.get(node.id)).filter((item): item is WorkflowNodeRun => !!item && item.status === "success");

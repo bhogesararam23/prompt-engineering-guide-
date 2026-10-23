@@ -50,7 +50,7 @@
 ## M6 — Release hardening
 - [x] Add production app-shell caching for repeat offline visits; model weights and API calls are intentionally excluded.
 - [x] Add Playwright smoke tests for the production preview: overview, guide search, prompt save/version comparison, and model-free evaluation UI.
-- [ ] Confirm CI passes and complete the keyboard/accessibility audit.
+- [x] Confirm CI passes on merged commit 1b46e69 (GitHub Actions run #254); complete the keyboard/accessibility audit separately.
 - [ ] Audit dependencies, licenses, model weights, and actual network traffic.
 - [ ] Test a clean install, mobile layout, local inference, failure recovery, and offline behavior.
 - [ ] Publish reproducible deployment and rollback instructions.
@@ -59,7 +59,7 @@ A checkbox means code exists, not that quality gates have passed. Keep unfinishe
 
 ## M7 — Advanced prompting techniques and workflow builder
 
-The full specification is in [Advanced Prompting and Workflow Builder Specification](ADVANCED_PROMPTING_SPEC.md). A first implementation slice now exists on the feature branch; release readiness remains gated on CI, accessibility, model/runtime verification, and licensing/security follow-up.
+The first implementation slice is merged to main. The specification remains the product contract; release readiness is still gated on accessibility, model/runtime verification, security remediation, and licensing follow-up.
 
 - [x] Research and document official OpenAI, Anthropic, and Google guidance with primary-source links.
 - [x] Distinguish product terminology (“looped prompting”, “graph workflow prompting”) from vendor naming and the Graph of Thoughts research framework.
@@ -72,7 +72,7 @@ The full specification is in [Advanced Prompting and Workflow Builder Specificat
 - [x] Preserve partial node traces when a user cancels execution.
 - [x] Add an accessible workflow outline, node inspector, branch-port editor, run traces, and a model-free starter graph.
 - [x] Add unit and Playwright coverage for catalog links, malformed workflow graphs, bounded loops, persistence, cancellation, and model-free user journeys.
-- [ ] Verify CI on the exact current feature-branch head.
+- [x] Verify CI on the exact merged commit before starting the next runtime milestone.
 - [x] Add a draggable node canvas with SVG connection paths, saved positions, an auto-arrange action, numeric position controls, and an accessible Outline fallback.
 - [x] Add bounded undo/redo history for node edits, connection changes, and canvas positioning.
 - [x] Add a Human Review node with approve/reject ports, optional edited output, reviewer notes, and auditable trace data.
@@ -85,3 +85,18 @@ The full specification is in [Advanced Prompting and Workflow Builder Specificat
 - [ ] Finalize the project license, dependency/model licensing review, and deployment decision.
 
 **Implementation boundary:** the visible workflow graph is a DAG. Retry cycles are encapsulated in the Loop Controller, which enforces a finite attempt limit. No hosted LLM provider, provider SDK, API key, arbitrary code execution, arbitrary network-call node, or mandatory backend was added.
+
+## M8 — Workflow runtime reliability and parallel DAG scheduling
+
+- [x] Schedule reachable nodes by dependency frontier so independent branches can run concurrently without allowing a merge to race unfinished inputs.
+- [x] Preserve deterministic merge input order, final trace order, and error order even when independent tasks finish at different times.
+- [x] Serialize generation calls by default for the single shared WebLLM worker; provide an explicit opt-in for concurrency-safe injected generators.
+- [x] Serialize human-review requests by default for the single interactive review dialog.
+- [x] Make a pending human-review promise listen to its abort signal, remove its listener after settlement, close the dialog, and complete the run as cancelled.
+- [x] Add unit coverage for genuinely concurrent safe generators and safe-by-default serialization.
+- [x] Add a production-preview E2E test for cancelling a run while it is paused at human review.
+- [ ] Extend manual validation to nested fan-out/merge graphs and aborts that occur while several independent nodes are in flight.
+- [ ] Profile large graphs near configured node/edge limits and document practical browser limits.
+- [ ] Verify keyboard focus return and screen-reader announcements for the cancel-and-resume lifecycle.
+
+Runtime boundary: concurrency is bounded by dependency readiness, not an unbounded worker pool. Single-worker local inference and the single review dialog remain serialized by default. Parallelism must not change the data order seen by merge nodes or make cancellation depend on whichever promise settles first.

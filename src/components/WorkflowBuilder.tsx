@@ -112,11 +112,27 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
     });
   };
   const requestHumanReview = (request: HumanReviewRequest, signal?: AbortSignal) => new Promise<HumanReviewDecision>((resolve) => {
+    let settled = false;
+    let onAbort: () => void = () => undefined;
+    const settle = (decision: HumanReviewDecision) => {
+      if (settled) return;
+      settled = true;
+      signal?.removeEventListener("abort", onAbort);
+      resolve(decision);
+    };
+    onAbort = () => {
+      if (reviewResolverRef.current === settle) {
+        reviewResolverRef.current = null;
+        setPendingReview(null);
+      }
+      settle({ approved: false, cancelled: true });
+    };
     if (signal?.aborted) {
-      resolve({ approved: false, cancelled: true });
+      settle({ approved: false, cancelled: true });
       return;
     }
-    reviewResolverRef.current = resolve;
+    reviewResolverRef.current = settle;
+    signal?.addEventListener("abort", onAbort, { once: true });
     setPendingReview(request);
     setReviewDraft(request.input);
     setReviewNote("");
@@ -484,7 +500,7 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
       <div className="panel-heading"><div><p className="eyebrow">EXECUTION</p><h2>Run and inspect</h2></div><span className={modelReady ? "status-good" : "status-muted"}>{modelReady ? "Local model ready" : "Model not loaded"}</span></div>
       <p className="muted">Deterministic nodes work without a model. Prompt and loop nodes need the local WebGPU model to be loaded in Local playground.</p>
       <div className="workflow-run-input"><label htmlFor="workflow-input-value">Input value</label><textarea id="workflow-input-value" rows={3} value={inputValue} onChange={(event) => setInputValue(event.target.value)} placeholder="Text passed to each Input node…" /></div>
-      <div className="editor-actions"><button className="button primary" type="button" disabled={running || errors.length > 0} onClick={() => void execute()}>{running ? "Running workflow…" : "Run workflow"}</button>{running ? <button className="button secondary" type="button" onClick={() => { abortRef.current?.abort(); interruptLocalGeneration(); if (reviewResolverRef.current) finishHumanReview({ approved: false, cancelled: true }); }}>Cancel run</button> : null}<span className="workflow-model-disclaimer">No hosted LLM API is configured.</span></div>
+      <div className="editor-actions"><button className="button primary" type="button" disabled={running || errors.length > 0} onClick={() => void execute()}>{running ? "Running workflow…" : "Run workflow"}</button>{running && !pendingReview ? <button className="button secondary" type="button" onClick={() => { abortRef.current?.abort(); interruptLocalGeneration(); }}>Cancel run</button> : null}<span className="workflow-model-disclaimer">No hosted LLM API is configured.</span></div>
       {notice ? <div className="workflow-notice" role="status">{notice}</div> : null}
       {(lastRun || liveRuns.length > 0) && <div className="workflow-trace"><h3>{lastRun ? "Last run · " + runStatusLabel(lastRun.status) : "Live execution trace"}</h3>{(lastRun?.nodeRuns || liveRuns).map((nodeRun) => <article className={"workflow-trace-item " + nodeRun.status} key={nodeRun.nodeId}><div><strong>{workflow.nodes.find((node) => node.id === nodeRun.nodeId)?.label || nodeRun.nodeId}</strong><span>{nodeRun.status} · {nodeRun.durationMs} ms{nodeRun.selectedPort ? " · port: " + nodeRun.selectedPort : ""}</span></div>{nodeRun.error ? <p>{nodeRun.error}</p> : null}{nodeRun.review ? <p className="workflow-review-result">Human decision: <strong>{nodeRun.review.decision}</strong>{nodeRun.review.note ? " · " + nodeRun.review.note : ""}</p> : null}{nodeRun.iterations?.length ? <ol>{nodeRun.iterations.map((iteration) => <li key={iteration.attempt}>Attempt {iteration.attempt}: {iteration.passed ? "passed" : "not passed"} · {iteration.candidate.slice(0, 180)}{iteration.candidate.length > 180 ? "…" : ""}<small>{iteration.feedback}</small></li>)}</ol> : null}<pre>{nodeRun.output || (nodeRun.status === "skipped" ? "Skipped because no incoming branch was selected." : "No output")}</pre></article>)}
         {lastRun?.errors.map((item) => <p className="check-error" key={item}>! {item}</p>)}
@@ -504,6 +520,7 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
         <div className="field"><label htmlFor="workflow-review-note">Review note (optional)</label><textarea id="workflow-review-note" rows={2} value={reviewNote} onChange={(event) => setReviewNote(event.target.value)} placeholder="Why did you approve or reject this output?" /></div>
         <p className="field-help">Approve continues through the approve edge. Reject follows the reject edge. Cancelling the run stops workflow execution.</p>
         <div className="workflow-review-actions">
+          <button type="button" className="button secondary" onClick={() => { abortRef.current?.abort(); interruptLocalGeneration(); }}>Cancel run</button>
           <button type="button" className="button secondary danger-outline" onClick={() => finishHumanReview({ approved: false, feedback: reviewNote })}>Reject</button>
           <button type="button" className="button primary" onClick={() => finishHumanReview({ approved: true, ...(pendingReview.allowEdit ? { output: reviewDraft } : {}), feedback: reviewNote })}>Approve and continue</button>
         </div>
