@@ -4,9 +4,12 @@ import { validateWorkflow, workflowHasErrors } from "./validate";
 
 export type WorkflowInputs = Record<string, string>;
 export type LocalGenerate = (prompt: string, systemPrompt?: string, signal?: AbortSignal) => Promise<string>;
+export type HumanReviewDecision = { approved: boolean; output?: string; feedback?: string; cancelled?: boolean };
+export type HumanReviewRequest = { nodeId: string; label: string; instruction: string; input: string; allowEdit: boolean };
 export type WorkflowRunOptions = {
   inputs?: WorkflowInputs;
   generate?: LocalGenerate;
+  review?: (request: HumanReviewRequest, signal?: AbortSignal) => Promise<HumanReviewDecision>;
   signal?: AbortSignal;
   onNodeRun?: (run: WorkflowNodeRun) => void;
 };
@@ -92,6 +95,7 @@ export async function runWorkflow(
       let output = "";
       let selectedPort: string | undefined;
       let iterations: WorkflowNodeRun["iterations"];
+      let review: WorkflowNodeRun["review"];
       switch (node.type) {
         case "input": {
           output = options.inputs?.[node.config.key] ?? node.config.defaultValue ?? "";
@@ -173,13 +177,32 @@ export async function runWorkflow(
           selectedPort = passed ? "pass" : "limit";
           break;
         }
+        case "human-review": {
+          if (!options.review) throw new Error("This workflow requires an explicit human-review decision, but no review handler is available.");
+          const decision = await options.review({
+            nodeId: node.id,
+            label: node.label,
+            instruction: node.config.instruction,
+            input,
+            allowEdit: node.config.allowEdit
+          }, options.signal);
+          if (decision.cancelled) {
+            const error = new Error("Workflow execution was cancelled during human review.");
+            error.name = "AbortError";
+            throw error;
+          }
+          selectedPort = decision.approved ? "approve" : "reject";
+          output = decision.approved && node.config.allowEdit && typeof decision.output === "string" ? decision.output : input;
+          review = { decision: selectedPort, note: decision.feedback || "" };
+          break;
+        }
         case "output": {
           output = input;
           outputs.push(output);
           break;
         }
       }
-      const completed: WorkflowNodeRun = { nodeId, status: "success", input, output, durationMs: Date.now() - start, ...(selectedPort ? { selectedPort } : {}), ...(iterations ? { iterations } : {}) };
+      const completed: WorkflowNodeRun = { nodeId, status: "success", input, output, durationMs: Date.now() - start, ...(selectedPort ? { selectedPort } : {}), ...(iterations ? { iterations } : {}), ...(review ? { review } : {}) };
       runs.set(nodeId, completed);
       options.onNodeRun?.(completed);
       if (node.type === "loop" && selectedPort === "limit") {
