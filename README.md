@@ -7,6 +7,10 @@ A local-first learning guide and prompt workbench. Learn practical prompting tec
 ## Features
 
 - Eight source-linked learning modules with examples and deterministic knowledge checks whose attempts are saved locally.
+- Advanced Techniques Library with 12 sourced technique cards covering prompt structure, few-shot prompting, chaining, bounded refinement, evaluation flywheels, routing, parallel aggregation, graph workflows, and Graph of Thoughts research.
+- Accessible Graph & Loop Builder with typed node configuration, connection/port editing, graph diagnostics, validated JSON import/export, and local workflow saving.
+- Deterministic workflow execution for input, transformation, validation, routing, merging, and output nodes; prompt and loop nodes require the explicitly loaded local model.
+- Bounded self-correction nodes with a hard limit of 1–10 attempts, deterministic acceptance checks, visible iteration traces, cancellation, and local run history.
 - Prompt Lab for role, task, context, examples, input, constraints, and output format.
 - Deterministic prompt assembly and basic validation; previews do not call an LLM.
 - An evaluation bench with editable test cases, exact-match scoring, locally generated outputs, cancellation, export/import, and saved prompt/dataset snapshots.
@@ -56,7 +60,7 @@ The API stores prompts in a local SQLite database and provides health and determ
 - docs/ARCHITECTURE.md — application boundaries and data flow.
 - docs/BACKEND.md — backend setup and endpoint reference.
 - docs/ROADMAP.md — milestones, exit gates, and known unfinished work.
-- docs/ADVANCED_PROMPTING_SPEC.md — sourced specification for iterative/looped prompts, graph workflows, provider-inspired techniques, execution rules, tests, and implementation phases.
+- docs/ADVANCED_PROMPTING_SPEC.md — source-linked specification for advanced techniques, loop behavior, workflow graph semantics, safety, and release criteria.
 - SECURITY.md — data handling and security expectations.
 - CONTRIBUTING.md — development and contribution workflow.
 
