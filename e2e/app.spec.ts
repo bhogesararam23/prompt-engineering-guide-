@@ -120,6 +120,20 @@ test("human review pauses a workflow and forwards approved edits", async ({ page
 });
 
 
+test("cancelling during human review closes the dialog and records a cancelled run", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Graph & loops/ }).click();
+  await page.locator('.workflow-toolbar-actions .workflow-file-button input[type="file"]').setInputFiles("e2e/fixtures/human-review-workflow.json");
+  await expect(page.getByRole("status")).toContainText("Workflow imported and validated");
+  await page.locator("#workflow-input-value").fill("Draft that needs review");
+  await page.getByRole("button", { name: "Run workflow" }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.getByRole("button", { name: "Cancel run" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByRole("status")).toContainText("Workflow cancelled");
+  await expect(page.locator(".workflow-final-output")).toBeVisible();
+});
+
 test("workflow evaluation scores the starter graph against the same local dataset", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /Graph & loops/ }).click();
