@@ -126,6 +126,7 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
     setSelectedNodeId(item.nodes[0]?.id || "");
     setSourceId(item.nodes[0]?.id || "");
     setTargetId(item.nodes[1]?.id || item.nodes[0]?.id || "");
+    setSourcePort(portsFor(item.nodes[0])[0]);
     setLastRun(null);
     setLiveRuns([]);
     setNotice("Saved workflow loaded.");
@@ -166,6 +167,7 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
       setSelectedNodeId(imported.nodes[0]?.id || "");
       setSourceId(imported.nodes[0]?.id || "");
       setTargetId(imported.nodes[1]?.id || imported.nodes[0]?.id || "");
+      setSourcePort(portsFor(imported.nodes[0])[0]);
       setLastRun(null);
       setLiveRuns([]);
       setNotice("Workflow imported and validated. Save it to keep it in this browser.");
@@ -256,7 +258,7 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
 
     <div className="workflow-toolbar">
       <div className="workflow-toolbar-group"><label htmlFor="saved-workflows">SAVED WORKFLOWS</label><select id="saved-workflows" value="" onChange={(event) => openSaved(event.target.value)}><option value="">Open saved workflow…</option>{saved.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></div>
-      <div className="workflow-toolbar-actions"><button className="button secondary" type="button" onClick={newLinear}>New</button><button className="button secondary" type="button" onClick={() => { const next = createStarterWorkflow("Branch and merge demo"); setWorkflow(next); setSelectedNodeId(next.nodes[0].id); setSourceId(next.nodes[0].id); setTargetId(next.nodes[1].id); setLastRun(null); }}>Load sample graph</button><button className="button primary" type="button" onClick={saveCurrent}>Save locally</button><button className="button secondary" type="button" onClick={exportCurrent}>Export JSON</button><label className="button secondary workflow-file-button">Import JSON<input type="file" accept=".json,application/json" onChange={(event) => { void importCurrent(event.target.files?.[0]); event.currentTarget.value = ""; }} /></label></div>
+      <div className="workflow-toolbar-actions"><button className="button secondary" type="button" onClick={newLinear}>New</button><button className="button secondary" type="button" onClick={() => { const next = createStarterWorkflow("Branch and merge demo"); setWorkflow(next); setSelectedNodeId(next.nodes[0].id); setSourceId(next.nodes[0].id); setTargetId(next.nodes[1].id); setSourcePort("output"); setLastRun(null); }}>Load sample graph</button><button className="button primary" type="button" onClick={saveCurrent}>Save locally</button><button className="button secondary" type="button" onClick={exportCurrent}>Export JSON</button><label className="button secondary workflow-file-button">Import JSON<input type="file" accept=".json,application/json" onChange={(event) => { void importCurrent(event.target.files?.[0]); event.currentTarget.value = ""; }} /></label></div>
     </div>
 
     <div className="workflow-name-row"><div className="field"><label htmlFor="workflow-name">Workflow name</label><input id="workflow-name" value={workflow.name} onChange={(event) => updateWorkflow({ ...workflow, name: event.target.value })} /></div><div className="field"><label htmlFor="workflow-description">Description</label><input id="workflow-description" value={workflow.description} onChange={(event) => updateWorkflow({ ...workflow, description: event.target.value })} /></div></div>
