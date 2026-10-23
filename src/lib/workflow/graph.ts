@@ -83,8 +83,18 @@ export function createLinearWorkflow(types: WorkflowNodeType[], name: string): W
   const edges: WorkflowEdge[] = [];
   for (let index = 0; index < nodes.length - 1; index += 1) {
     const source = nodes[index];
-    const fromPort = source.type === "router" ? "match" : source.type === "validator" ? "pass" : source.type === "loop" ? "pass" : undefined;
-    edges.push({ id: `edge-${index + 1}`, from: source.id, to: nodes[index + 1].id, ...(fromPort ? { fromPort } : {}) });
+    const target = nodes[index + 1];
+    const ports = source.type === "router" ? ["match", "no-match"] :
+      source.type === "validator" ? ["pass", "fail"] :
+      source.type === "loop" ? ["pass", "limit"] : [undefined];
+    for (const [portIndex, fromPort] of ports.entries()) {
+      edges.push({
+        id: `edge-${index + 1}-${portIndex + 1}`,
+        from: source.id,
+        to: target.id,
+        ...(fromPort ? { fromPort } : {})
+      });
+    }
   }
   const now = new Date().toISOString();
   return { schemaVersion: 1, id: "workflow-" + now.replace(/\D/g, "").slice(0, 14), name, description: "", entryNodeId: nodes.find((node) => node.type === "input")!.id, nodes, edges, createdAt: now, updatedAt: now };
