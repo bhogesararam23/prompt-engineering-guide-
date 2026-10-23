@@ -42,7 +42,7 @@ export type WorkflowDefinition = {
 export type WorkflowIssue = { code: string; message: string; nodeId?: string; edgeId?: string; severity: "error" | "warning" };
 export type WorkflowNodeRun = {
   nodeId: string;
-  status: "success" | "failed" | "skipped";
+  status: "success" | "failed" | "skipped" | "cancelled";
   input: string;
   output: string;
   durationMs: number;
