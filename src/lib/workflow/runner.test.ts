@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { createLinearWorkflow, createStarterWorkflow } from "./graph";
-import { runWorkflow } from "./runner";
+import { runWorkflow, type HumanReviewRequest } from "./runner";
 import type { WorkflowDefinition } from "./types";
 
 describe("workflow runtime", () => {
@@ -57,7 +57,7 @@ describe("workflow runtime", () => {
 
   it("pauses for a human decision and records an approved edit", async () => {
     const graph = createLinearWorkflow(["input", "human-review", "output"], "human approval");
-    const review = vi.fn(async (request) => {
+    const review = vi.fn(async (request: HumanReviewRequest) => {
       expect(request.input).toBe("draft output");
       expect(request.allowEdit).toBe(true);
       return { approved: true, output: "reviewed output", feedback: "Checked the required fields." };
