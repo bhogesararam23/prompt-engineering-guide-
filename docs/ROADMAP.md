@@ -15,7 +15,9 @@
 ## M2 — Learning and Prompt Lab
 - [x] Foundation and advanced lesson modules with practical examples.
 - [x] Prompt templates and structured prompt fields.
-- [x] Save, copy, search lessons, filter categories, and export/import prompt library.
+- [x] Save, copy, search lessons, filter categories, and export/import the prompt library.
+- [x] Compare two saved prompt snapshots using a bounded line-level diff.
+- [x] Validate imported prompt records and re-key ID collisions.
 - [x] Add bookmarks, lesson completion progress, and progress persistence tests.
 - [ ] Complete keyboard-navigation review and add import parser tests for duplicate IDs and oversized records.
 
