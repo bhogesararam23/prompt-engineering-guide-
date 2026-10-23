@@ -270,10 +270,10 @@ export default function App() {
       title: technique.title,
       role: "",
       instruction: technique.steps[0] || technique.summary,
-      context: technique.summary + "\\n\\nWhen to use: " + technique.whenToUse.join("; "),
+      context: technique.summary + "\n\nWhen to use: " + technique.whenToUse.join("; "),
       examples: technique.example,
       constraints: "Trade-offs and failure modes: " + technique.tradeoffs.join(" "),
-      outputFormat: technique.steps.map((step, index) => (index + 1) + ". " + step).join("\\n")
+      outputFormat: technique.steps.map((step, index) => (index + 1) + ". " + step).join("\n")
      }));
      setView("lab");
      setNotice("Technique loaded into Prompt Lab. Adapt it to your task and test it with representative cases.");
