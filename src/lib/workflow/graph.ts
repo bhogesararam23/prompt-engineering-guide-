@@ -50,6 +50,7 @@ export function createNode(type: "validator", index: number): Extract<WorkflowNo
 export function createNode(type: "router", index: number): Extract<WorkflowNode, { type: "router" }>;
 export function createNode(type: "merge", index: number): Extract<WorkflowNode, { type: "merge" }>;
 export function createNode(type: "loop", index: number): Extract<WorkflowNode, { type: "loop" }>;
+export function createNode(type: "human-review", index: number): Extract<WorkflowNode, { type: "human-review" }>;
 export function createNode(type: "output", index: number): Extract<WorkflowNode, { type: "output" }>;
 export function createNode(type: WorkflowNodeType, index: number): WorkflowNode;
 export function createNode(type: WorkflowNodeType, index: number): WorkflowNode {
@@ -62,6 +63,7 @@ export function createNode(type: WorkflowNodeType, index: number): WorkflowNode 
     case "router": return { ...base, type, label: "Route", config: { condition: "is-empty", value: "" } };
     case "merge": return { ...base, type, label: "Merge", config: { strategy: "join", separator: "\n\n" } };
     case "loop": return { ...base, type, label: "Bounded loop", config: { maxIterations: 3, draftInstruction: "Create a first draft.", reviewInstruction: "Review the candidate against the acceptance criteria and describe only specific failures.", refineInstruction: "Improve the candidate using the feedback. Return the revised artifact only.", evaluator: "non-empty" } };
+    case "human-review": return { ...base, type, label: "Human review", config: { instruction: "Review the preceding output before it continues. Check factual support, required fields, and any safety concerns.", allowEdit: true } };
     case "output": return { ...base, type, label: "Output", config: { displayName: "Final output" } };
   }
 }
