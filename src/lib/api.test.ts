@@ -28,6 +28,7 @@ describe("optional API helpers", () => {
     expect(() => normalizeApiBase("https://user:pass@example.com")).toThrow(/credentials/);
     expect(() => normalizeApiBase("http://api.example.com")).toThrow(/HTTPS for remote/);
     expect(normalizeApiBase("http://127.0.0.1:8000")).toBe("http://127.0.0.1:8000");
+    expect(normalizeApiBase("http://[::1]:8000/")).toBe("http://[::1]:8000");
   });
   it("rekeys remote IDs that collide with local prompts", () => {
     const localPrompt = { id: "same-id", title: "Local", content: "Keep me", createdAt: "2026-01-01T00:00:00Z" };
