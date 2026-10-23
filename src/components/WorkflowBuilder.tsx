@@ -44,6 +44,8 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
   const [running, setRunning] = useState(false);
   const [notice, setNotice] = useState("");
   const [editorMode, setEditorMode] = useState<"canvas" | "outline">("canvas");
+  const [undoStack, setUndoStack] = useState<WorkflowDefinition[]>([]);
+  const [redoStack, setRedoStack] = useState<WorkflowDefinition[]>([]);
   const abortRef = useRef<AbortController | null>(null);
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const selectedNode = workflow.nodes.find((node) => node.id === selectedNodeId);
@@ -51,7 +53,37 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
   const errors = validation.filter((item) => item.severity === "error");
   const warnings = validation.filter((item) => item.severity === "warning");
 
-  const updateWorkflow = (next: WorkflowDefinition) => setWorkflow({ ...next, updatedAt: new Date().toISOString() });
+  const updateWorkflow = (next: WorkflowDefinition) => {
+    setUndoStack((stack) => [...stack, workflow].slice(-40));
+    setRedoStack([]);
+    setWorkflow({ ...next, updatedAt: new Date().toISOString() });
+  };
+  const undoWorkflow = () => {
+    const previous = undoStack[undoStack.length - 1];
+    if (!previous) return;
+    setRedoStack((stack) => [workflow, ...stack].slice(0, 40));
+    setUndoStack((stack) => stack.slice(0, -1));
+    setWorkflow({ ...previous, updatedAt: new Date().toISOString() });
+    const selected = previous.nodes.find((node) => node.id === selectedNodeId);
+    if (!selected) setSelectedNodeId(previous.nodes[0]?.id || "");
+    setSourceId((id) => previous.nodes.some((node) => node.id === id) ? id : previous.nodes[0]?.id || "");
+    setTargetId((id) => previous.nodes.some((node) => node.id === id) ? id : previous.nodes[1]?.id || previous.nodes[0]?.id || "");
+    setSourcePort("output");
+    setNotice("Undid the previous workflow edit.");
+  };
+  const redoWorkflow = () => {
+    const next = redoStack[0];
+    if (!next) return;
+    setUndoStack((stack) => [...stack, workflow].slice(-40));
+    setRedoStack((stack) => stack.slice(1));
+    setWorkflow({ ...next, updatedAt: new Date().toISOString() });
+    const selected = next.nodes.find((node) => node.id === selectedNodeId);
+    if (!selected) setSelectedNodeId(next.nodes[0]?.id || "");
+    setSourceId((id) => next.nodes.some((node) => node.id === id) ? id : next.nodes[0]?.id || "");
+    setTargetId((id) => next.nodes.some((node) => node.id === id) ? id : next.nodes[1]?.id || next.nodes[0]?.id || "");
+    setSourcePort("output");
+    setNotice("Reapplied the workflow edit.");
+  };
   const updateNodeLabel = (nodeId: string, label: string) => updateWorkflow({
     ...workflow,
     nodes: workflow.nodes.map((node) => node.id === nodeId ? { ...node, label } as WorkflowNode : node)
@@ -69,7 +101,7 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
     node.id = idFor(newNodeType);
     node.position = { x: 70 + (workflow.nodes.length % 3) * 220, y: 70 + Math.floor(workflow.nodes.length / 3) * 140 };
     const next = { ...workflow, nodes: [...workflow.nodes, node], updatedAt: new Date().toISOString() };
-    setWorkflow(next);
+    updateWorkflow(next);
     setSelectedNodeId(node.id);
     setTargetId(node.id);
     setNotice("Node added. Configure its settings and connect it to the graph.");
@@ -136,6 +168,8 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
 
   const newLinear = () => {
     const next = createLinearWorkflow(["input", "transform", "output"], "Untitled workflow");
+    setUndoStack([]);
+    setRedoStack([]);
     setWorkflow(next);
     setSelectedNodeId(next.nodes[0].id);
     setSourceId(next.nodes[0].id);
@@ -165,6 +199,8 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
     if (!file) return;
     try {
       const imported = parseWorkflow(await file.text());
+      setUndoStack([]);
+      setRedoStack([]);
       setWorkflow(imported);
       setSelectedNodeId(imported.nodes[0]?.id || "");
       setSourceId(imported.nodes[0]?.id || "");
@@ -301,6 +337,10 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
           <div className="workflow-view-toggle" role="group" aria-label="Workflow editor view">
             <button type="button" className={editorMode === "canvas" ? "selected" : ""} aria-pressed={editorMode === "canvas"} onClick={() => setEditorMode("canvas")}>Canvas</button>
             <button type="button" className={editorMode === "outline" ? "selected" : ""} aria-pressed={editorMode === "outline"} onClick={() => setEditorMode("outline")}>Outline</button>
+          </div>
+          <div className="workflow-history-controls">
+            <button className="button secondary" type="button" disabled={!undoStack.length} onClick={undoWorkflow}>Undo</button>
+            <button className="button secondary" type="button" disabled={!redoStack.length} onClick={redoWorkflow}>Redo</button>
           </div>
           <button className="button secondary" type="button" onClick={autoArrange}>Auto-arrange nodes</button>
         </div>
