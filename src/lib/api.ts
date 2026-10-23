@@ -7,6 +7,8 @@ export function normalizeApiBase(value: string): string {
   let url: URL;
   try { url = new URL(value.trim()); } catch { throw new Error("Enter a valid absolute API URL, including http:// or https://."); }
   if (url.protocol !== "http:" && url.protocol !== "https:") throw new Error("The API URL must use HTTP or HTTPS.");
+  const loopbackHosts = new Set(["localhost", "127.0.0.1", "::1"]);
+  if (url.protocol === "http:" && !loopbackHosts.has(url.hostname)) throw new Error("Use HTTPS for remote API endpoints. Plain HTTP is allowed only for localhost development.");
   if (url.username || url.password) throw new Error("Do not place credentials in the API URL.");
   if (url.search || url.hash) throw new Error("Remove the query string or fragment from the API base URL.");
   return url.toString().replace(/\/+$/, "");
