@@ -68,9 +68,10 @@ export async function runWorkflow(
   const errors: string[] = [];
   const outputs: string[] = [];
   const startedAt = new Date().toISOString();
+  let wasCancelled = false;
 
   for (const nodeId of order) {
-    throwIfAborted(options.signal);
+    if (options.signal?.aborted) { wasCancelled = true; break; }
     const node = nodeById.get(nodeId);
     if (!node) continue;
     const start = Date.now();
@@ -179,7 +180,7 @@ export async function runWorkflow(
       runs.set(nodeId, completed);
       options.onNodeRun?.(completed);
     } catch (error) {
-      if (error instanceof Error && error.name === "AbortError") throw error;
+      if (error instanceof Error && error.name === "AbortError") { wasCancelled = true; break; }
       const message = error instanceof Error ? error.message : "Unknown node failure.";
       const failed: WorkflowNodeRun = { nodeId, status: "failed", input, output: "", durationMs: Date.now() - start, error: message };
       runs.set(nodeId, failed);
@@ -197,7 +198,7 @@ export async function runWorkflow(
     workflowName: workflow.name,
     startedAt,
     finishedAt: new Date().toISOString(),
-    status: errors.length ? "failed" : outputNodeRuns.length ? "success" : "failed",
+    status: wasCancelled ? "cancelled" : errors.length ? "failed" : outputNodeRuns.length ? "success" : "failed",
     output: finalOutput,
     nodeRuns,
     errors
