@@ -368,11 +368,13 @@ The first release of this addition is acceptable only when:
 3. A user can design a loop with a clear finite maximum and see every attempt plus the final stop reason.
 4. A user can create, connect, validate, save, reload, and export a workflow graph.
 5. Unbounded cycles, missing references, duplicate IDs, invalid ports, malformed imports, and over-limit inputs are rejected with useful errors.
-6. Deterministic nodes execute without loading a model. Model-backed nodes do not run until the user explicitly loads the local model.
-7. There are no hosted LLM API calls, API key fields, provider SDKs, background cloud sync, or new mandatory backend dependencies.
-8. Workflow changes are covered by unit tests; major user journeys are covered by Playwright tests.
-9. Evaluation labels make it clear whether results came from deterministic checks, a human, or a model-based reviewer.
-10. The user can inspect and export run traces without needing a cloud account.
+6. Human review pauses the run until an explicit approve/reject decision; optional reviewer edits and the decision note are captured, and cancellation resolves the paused run.
+7. Workflow evaluation compares fixed local cases with explicit match rules, stores workflow/dataset snapshots, exposes per-case outputs, and refuses unattended execution of human-review graphs.
+8. Deterministic nodes execute without loading a model. Model-backed nodes do not run until the user explicitly loads the local model.
+9. There are no hosted LLM API calls, API key fields, provider SDKs, background cloud sync, or new mandatory backend dependencies.
+10. Workflow changes are covered by unit tests; major user journeys are covered by Playwright tests.
+11. Evaluation labels make it clear whether results came from deterministic checks, a human, or a model-based reviewer.
+12. The user can inspect and export run traces without needing a cloud account.
 
 ## 11. Reference list
 
