@@ -182,6 +182,7 @@ export default function WorkflowEvaluationPanel({ workflow, modelReady, generate
         <div><strong>{item.name}</strong><span className={"workflow-node-run " + (item.matched === true ? "success" : item.execution === "cancelled" ? "cancelled" : "failed")}>{item.execution === "cancelled" ? "cancelled" : item.matched === true ? "pass" : "fail"}</span></div>
         <p>Rule: {item.matchRule} · Expected: <code>{item.expected || "(empty)"}</code></p>
         <pre>{item.actual || "(no output)"}</pre>
+        {item.trace?.length ? <details className="workflow-eval-trace"><summary>Node trace ({item.trace.length} steps)</summary>{item.trace.map((node) => <article className="workflow-eval-trace-node" key={node.nodeId}><div><strong>{node.nodeId}</strong><span className={"workflow-node-run " + node.status}>{node.status}</span></div>{node.selectedPort ? <p>Selected route: <code>{node.selectedPort}</code></p> : null}{node.error ? <p className="check-error">{node.error}</p> : null}<pre>{node.output || "(empty output)"}</pre></article>)}</details> : null}
         {item.errors.map((error) => <p className="check-error" key={error}>{error}</p>)}
       </article>)}
     </div>}
