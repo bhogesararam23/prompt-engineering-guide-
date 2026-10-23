@@ -128,7 +128,7 @@ test("cancelling during human review closes the dialog and records a cancelled r
   await page.locator("#workflow-input-value").fill("Draft that needs review");
   await page.getByRole("button", { name: "Run workflow" }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
-  await page.getByRole("button", { name: "Cancel run" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Cancel run" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.getByRole("status")).toContainText("Workflow cancelled");
   await expect(page.locator(".workflow-trace")).toContainText("Last run · Cancelled");
