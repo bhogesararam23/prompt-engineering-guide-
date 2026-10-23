@@ -53,3 +53,30 @@ test("evaluation bench and dataset controls work without loading a model", async
   await expect(page.getByRole("button", { name: "Run evaluation locally" })).toBeDisabled();
   await expect(page.getByRole("button", { name: /Export dataset/ })).toBeVisible();
 });
+
+
+test("advanced techniques are searchable and transfer into Prompt Lab", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Techniques/ }).click();
+  await expect(page.getByRole("heading", { name: "Techniques Library" })).toBeVisible();
+  await page.getByLabel("SEARCH TECHNIQUES").fill("Graph of Thoughts");
+  const card = page.getByRole("button", { name: /Graph of Thoughts \(research concept\)/ });
+  await expect(card).toBeVisible();
+  await expect(page.getByText(/Graph of Thoughts is this product's visual orchestration feature/)).toBeVisible();
+  await card.click();
+  await page.getByRole("button", { name: /Use in Prompt Lab/ }).click();
+  await expect(page.getByRole("heading", { name: "Prompt Lab" })).toBeVisible();
+  await expect(page.locator("#field-title")).toHaveValue("Graph of Thoughts (research concept)");
+});
+
+test("workflow builder runs a deterministic graph without local inference", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Graph & loops/ }).click();
+  await expect(page.getByRole("heading", { name: "Graph & Loop Builder" })).toBeVisible();
+  await expect(page.getByText("Graph structure valid")).toBeVisible();
+  await page.getByRole("button", { name: "Run workflow" }).click();
+  await expect(page.getByRole("status")).toContainText("Workflow completed");
+  await expect(page.getByText("Please summarize this document.", { exact: true }).last()).toBeVisible();
+  await page.getByRole("button", { name: "Save locally" }).click();
+  await expect(page.getByRole("status")).toContainText("Workflow saved to this browser");
+});
