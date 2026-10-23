@@ -56,6 +56,7 @@ The API stores prompts in a local SQLite database and provides health and determ
 - docs/ARCHITECTURE.md — application boundaries and data flow.
 - docs/BACKEND.md — backend setup and endpoint reference.
 - docs/ROADMAP.md — milestones, exit gates, and known unfinished work.
+- docs/ADVANCED_PROMPTING_SPEC.md — sourced specification for iterative/looped prompts, graph workflows, provider-inspired techniques, execution rules, tests, and implementation phases.
 - SECURITY.md — data handling and security expectations.
 - CONTRIBUTING.md — development and contribution workflow.
 
