@@ -49,7 +49,8 @@ describe("workflow runtime", () => {
     const graph = createLinearWorkflow(["input", "prompt", "output"], "cancelled");
     const controller = new AbortController();
     const generate = vi.fn(async () => { controller.abort(); return "done"; });
-    await expect(runWorkflow(graph, { inputs: { input: "x" }, generate, signal: controller.signal })).rejects.toMatchObject({ name: "AbortError" });
+    const result = await runWorkflow(graph, { inputs: { input: "x" }, generate, signal: controller.signal });
+    expect(result.status).toBe("cancelled");
   });
 
   it("records a callback after each node settles", async () => {
