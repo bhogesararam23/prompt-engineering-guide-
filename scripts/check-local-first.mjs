@@ -2,9 +2,11 @@ import { readdir, readFile } from "node:fs/promises";
 import { extname, join, relative } from "node:path";
 
 const root = process.cwd();
-const scanRoots = ["src", "public"];
-const directFiles = ["index.html", "package.json"];
+const scanRoots = ["src", "public", "e2e"];
+const directFiles = ["index.html", "package.json", "vite.config.ts", "playwright.config.ts"];
 const bannedOrigins = [
+  { label: "legacy Gemini reference", pattern: /\\bgemini\\b/i },
+
   /generativelanguage\.googleapis\.com/i,
   /api\.openai\.com/i,
   /api\.anthropic\.com/i,
@@ -49,7 +51,7 @@ for (const filePath of [...new Set(files)]) {
   catch { continue; }
   const label = relative(root, filePath);
   if (exposedGoogleKey.test(text)) findings.push(label + ": looks like an embedded Google API key.");
-  for (const pattern of bannedOrigins) if (pattern.test(text)) findings.push(label + ": contains hosted-LLM endpoint pattern " + pattern.source + ".");
+  for (const item of bannedOrigins) if (item.pattern.test(text)) findings.push(label + ": contains " + item.label + ".");
 }
 
 try {
@@ -68,5 +70,5 @@ if (findings.length) {
   for (const finding of findings) console.error(" - " + finding);
   process.exitCode = 1;
 } else {
-  console.log("Local-first policy check passed: no known hosted LLM endpoints, prohibited SDKs, or embedded Google API keys found in active app files.");
+  console.log("Local-first policy check passed: no legacy Gemini references, known hosted-LLM endpoints, prohibited SDKs, or embedded Google API keys found in active app files.");
 }
