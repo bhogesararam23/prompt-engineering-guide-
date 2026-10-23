@@ -193,7 +193,7 @@ export async function runWorkflow(
           }
           selectedPort = decision.approved ? "approve" : "reject";
           output = decision.approved && node.config.allowEdit && typeof decision.output === "string" ? decision.output : input;
-          review = { decision: selectedPort, note: decision.feedback || "" };
+          review = { decision: decision.approved ? "approve" : "reject", note: decision.feedback || "" };
           break;
         }
         case "output": {
