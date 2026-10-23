@@ -49,7 +49,7 @@ Inference is run by the browser runtime. The application does not send prompts t
 
 ## Optional API
 
-The API stores prompts in a local SQLite database and provides health and deterministic validation endpoints. It does not proxy or call an LLM. Read docs/BACKEND.md for setup. By default, Uvicorn should bind to localhost. The API does not implement user authentication, so do not expose it to an untrusted network or treat stored prompts as private in a public deployment.
+The API stores prompts in a local SQLite database and provides health and deterministic validation endpoints. It does not proxy or call an LLM. Read docs/BACKEND.md for setup. By default, Uvicorn should bind to localhost. The API supports optional bearer-token protection using `PROMPT_GUIDE_API_TOKEN`; configure the matching token in the API panel for the current session. This is single-user protection, not multi-tenant authentication. Keep the API on localhost unless you add full production security and deployment controls.
 
 ## Documentation
 
