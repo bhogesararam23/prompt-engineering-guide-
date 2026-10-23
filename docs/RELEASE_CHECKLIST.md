@@ -19,7 +19,7 @@ These are release gates, not claims of completion.
 - [ ] Clean install succeeds with the selected Node version.
 - [ ] Type checking, unit tests, production build, backend tests, and Playwright smoke tests pass.
 - [ ] Test malformed imports, storage quota failure, model initialization failure, unsupported WebGPU, cancellation, and model unload.
-- [ ] Complete keyboard, focus, reduced-motion, contrast, and screen-reader checks.
+- [ ] Complete keyboard, focus, reduced-motion, contrast, and screen-reader checks for the new knowledge-check UI.
 - [ ] Review all dependencies and licenses.
 
 ## Local model and offline behavior
