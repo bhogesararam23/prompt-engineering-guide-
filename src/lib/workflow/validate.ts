@@ -153,6 +153,9 @@ export function validateWorkflow(value: unknown): WorkflowIssue[] {
     reachable.add(id);
     for (const next of adjacency.get(id) || []) stack.push(next);
   }
+  if (!workflow.nodes.some((node) => node.type === "output" && reachable.has(node.id))) {
+    issue("unreachable-output", "At least one output node must be reachable from the entry input.", { nodeId: workflow.entryNodeId });
+  }
   for (const node of workflow.nodes) {
     if (!reachable.has(node.id)) issues.push({ code: "unreachable-node", message: `Node “${node.label}” is not reachable from the entry input.`, nodeId: node.id, severity: "warning" });
   }
