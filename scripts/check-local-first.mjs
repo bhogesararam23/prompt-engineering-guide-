@@ -57,8 +57,15 @@ for (const filePath of [...new Set(files)]) {
   }
   const label = relative(root, filePath);
   if (exposedGoogleKey.test(source)) findings.push(label + ": looks like an embedded Google API key.");
+  // The catalog may cite Google's official Gemini API documentation as learning material.
+  // Strip only this exact documentation URL before scanning for legacy runtime references;
+  // executable SDKs, inference endpoints, API keys, and other Gemini mentions remain blocked.
+  const sourceForPolicyScan = source.replace(
+    /https:\/\/ai\.google\.dev\/gemini-api\/docs\/prompting-strategies/gi,
+    "[Google prompting documentation]"
+  );
   for (const item of forbiddenPatterns) {
-    if (item.pattern.test(source)) findings.push(label + ": contains " + item.label + ".");
+    if (item.pattern.test(sourceForPolicyScan)) findings.push(label + ": contains " + item.label + ".");
   }
 }
 
@@ -78,5 +85,5 @@ if (findings.length) {
   for (const finding of findings) console.error(" - " + finding);
   process.exitCode = 1;
 } else {
-  console.log("Local-first policy check passed: no legacy Gemini references, known hosted-LLM endpoints, prohibited SDKs, or embedded Google API keys found in active app files.");
+  console.log("Local-first policy check passed: no legacy Gemini runtime references (Google's exact official documentation link is permitted), known hosted-LLM endpoints, prohibited SDKs, or embedded Google API keys found in active app files.");
 }
