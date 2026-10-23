@@ -34,6 +34,13 @@ describe("workflow validation", () => {
     expect(issues.some((item) => item.code === "invalid-edge-port")).toBe(true);
   });
 
+  it("rejects workflows with no output reachable from the entry input", () => {
+    const graph = createLinearWorkflow(["input", "output"], "disconnected output");
+    graph.edges = [];
+    const issue = validateWorkflow(graph).find((item) => item.code === "unreachable-output");
+    expect(issue?.severity).toBe("error");
+  });
+
   it("caps workflow size", () => {
     const graph = createLinearWorkflow(["input", "output"], "many");
     graph.nodes = Array.from({ length: 101 }, (_, index) => ({ id: "n-" + index, type: "transform" as const, label: "T", position: { x: 1, y: 1 }, config: { operation: "trim" as const } }));
