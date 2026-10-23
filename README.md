@@ -64,4 +64,4 @@ The API stores prompts in a local SQLite database and provides health and determ
 
 ## Current scope
 
-The frontend and API are separate capabilities; frontend-to-backend synchronization, accounts, content administration, broad evaluation suites, and fully offline model packaging remain future milestones.
+The frontend and API are separate capabilities. Prompt transfer is explicit and manually initiated; automatic/background sync, accounts, content administration, richer evaluation metrics, and fully offline model packaging remain future milestones.
