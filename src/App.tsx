@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { categories, lessons } from "./data/lessons";
-import { buildPrompt, countWords, emptyDraft, exportPrompts, parsePromptExport, readSavedPrompts, templates, validatePrompt, writeSavedPrompts, type PromptDraft, type SavedPrompt } from "./lib/prompts";
+import { buildPrompt, countWords, emptyDraft, exportPrompts, mergeImportedPrompts, parsePromptExport, readSavedPrompts, templates, validatePrompt, writeSavedPrompts, type PromptDraft, type SavedPrompt } from "./lib/prompts";
 import { DEFAULT_MODEL_ID, generateLocally, interruptLocalGeneration, loadLocalModel, supportsWebGPU, unloadLocalModel } from "./lib/local-model";
 import { readLearningState, writeLearningState } from "./lib/learning-state";
 import { exportEvaluationDataset, isExactMatch, parseEvaluationDataset, readEvaluationCases, readEvaluationRuns, starterEvaluationCases, summarizeEvaluation, writeEvaluationCases, writeEvaluationRuns, type EvaluationCase, type EvaluationRun } from "./lib/evaluation";
@@ -86,7 +86,7 @@ export default function App() {
  };
  const importLibrary = async (file?: File) => {
   if (!file) return;
-  try { const incoming = parsePromptExport(await file.text()); const ids = new Set(saved.map((x) => x.id)); const safe = incoming.map((item) => { let id = item.id; let suffix = 0; while (ids.has(id)) { id = item.id + "-import-" + Date.now() + "-" + suffix; suffix += 1; } ids.add(id); return { ...item, id }; }); setLibrary([...safe, ...saved]); setNotice("Imported " + safe.length + " prompt(s). Review imported text before using it."); }
+  try { const incoming = parsePromptExport(await file.text()); const merged = mergeImportedPrompts(saved, incoming); setLibrary(merged); setNotice("Imported " + incoming.length + " prompt(s). Review imported text before using it."); }
   catch (error) { setNotice(error instanceof Error ? error.message : "Could not import this file."); }
  };
  const updateEvaluationCases = (next: EvaluationCase[]) => {
