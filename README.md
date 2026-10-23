@@ -17,6 +17,7 @@ A local-first learning guide and prompt workbench. Learn practical prompting tec
 - Optional WebLLM inference using WebGPU-capable browsers, run in a dedicated worker with streamed output and interruption.
 - Optional FastAPI backend with SQLite persistence and deterministic validation.
 - A CI policy guard that fails if known hosted-LLM endpoints, provider SDKs, or exposed Google API keys return to active app files.
+- Playwright smoke tests for the main model-free user journeys and a production app-shell cache for repeat offline visits.
 - TypeScript checks, unit tests, API tests, and CI workflow.
 
 ## Frontend setup
@@ -35,6 +36,8 @@ npm run check:local-first
 npm run typecheck
 npm test
 npm run build
+npx playwright install chromium
+npm run test:e2e
 npm run preview
 ~~~
 
