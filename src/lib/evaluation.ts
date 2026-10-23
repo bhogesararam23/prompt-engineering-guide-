@@ -141,6 +141,7 @@ export function parseEvaluationDataset(raw: string): EvaluationCase[] {
   const items = parsed.cases as unknown[];
   if (items.length > 100) throw new Error("A dataset may contain at most 100 cases.");
   if (!items.every(isEvaluationCase)) throw new Error("Each case must contain string id, name, input, expected, and actual fields.");
+  if (new Set(items.map((item) => (item as EvaluationCase).id)).size !== items.length) throw new Error("Each evaluation case must have a unique ID.");
   if (items.some((item) => item.name.length > 200 || item.input.length > 100_000 || item.expected.length > 20_000 || item.actual.length > 50_000)) {
     throw new Error("A case exceeds the maximum allowed field length.");
   }
