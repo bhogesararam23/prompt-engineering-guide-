@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mergeApiPrompts, normalizeApiBase } from "./api";
+import { listApiPrompts, mergeApiPrompts, normalizeApiBase } from "./api";
 import type { SavedPrompt } from "./prompts";
 
 const local: SavedPrompt = { id: "local", title: "Same", content: "A prompt", createdAt: "2026-01-01T00:00:00Z" };
