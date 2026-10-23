@@ -2,7 +2,7 @@ import { readdir, readFile } from "node:fs/promises";
 import { extname, join, relative } from "node:path";
 
 const root = process.cwd();
-const scanRoots = ["src", "public", "e2e"];
+const scanRoots = ["src", "public", "e2e", "backend"];
 const directFiles = ["index.html", "package.json", "vite.config.ts", "playwright.config.ts"];
 const forbiddenPatterns = [
   { label: "legacy Gemini reference", pattern: /\bgemini\b/i },
@@ -27,7 +27,7 @@ const prohibitedPackages = new Set([
   "@ai-sdk/anthropic",
   "@cohere-ai/cohere-sdk"
 ]);
-const extensions = new Set([".ts", ".tsx", ".js", ".mjs", ".html", ".json"]);
+const extensions = new Set([".ts", ".tsx", ".js", ".mjs", ".html", ".json", ".py"]);
 const files = [];
 
 async function visit(path) {
