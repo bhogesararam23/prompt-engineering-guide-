@@ -73,6 +73,12 @@ test("workflow builder runs a deterministic graph without local inference", asyn
   await page.goto("/");
   await page.getByRole("button", { name: /Graph & loops/ }).click();
   await expect(page.getByRole("heading", { name: "Graph & Loop Builder" })).toBeVisible();
+  await expect(page.getByRole("group", { name: "Workflow editor view" })).toBeVisible();
+  await page.getByRole("button", { name: "Outline" }).click();
+  await expect(page.locator(".workflow-node-list")).toBeVisible();
+  await page.getByRole("button", { name: "Canvas" }).click();
+  await expect(page.locator(".workflow-canvas")).toBeVisible();
+  await expect(page.locator(".workflow-canvas-edge").first()).toBeVisible();
   await expect(page.getByText("Graph structure valid")).toBeVisible();
   await page.getByRole("button", { name: "Run workflow" }).click();
   await expect(page.getByRole("status")).toContainText("Workflow completed");
