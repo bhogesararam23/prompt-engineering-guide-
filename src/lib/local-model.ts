@@ -42,7 +42,7 @@ export async function loadLocalModel(onProgress: (message: string) => void): Pro
   enginePromise = (async () => {
     try {
       const runtime = await import("@mlc-ai/web-llm");
-      const engine = await runtime.CreateWebWorkerMLCEngine(DEFAULT_MODEL_ID, worker, {
+      const engine = await runtime.CreateWebWorkerMLCEngine(worker, DEFAULT_MODEL_ID, {
         initProgressCallback: (report: { text?: string }) => onProgress(report.text || "Preparing local model…")
       });
       return engine as unknown as Engine;
