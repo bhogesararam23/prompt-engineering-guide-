@@ -11,6 +11,8 @@ describe("optional API helpers", () => {
   it("rejects invalid protocols and URLs with embedded credentials", () => {
     expect(() => normalizeApiBase("javascript:alert(1)")).toThrow(/HTTP or HTTPS/);
     expect(() => normalizeApiBase("https://user:pass@example.com")).toThrow(/credentials/);
+    expect(() => normalizeApiBase("http://api.example.com")).toThrow(/HTTPS for remote/);
+    expect(normalizeApiBase("http://127.0.0.1:8000")).toBe("http://127.0.0.1:8000");
   });
   it("deduplicates duplicate entries returned by the remote API", () => {
     const remote = [
