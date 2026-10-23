@@ -23,6 +23,11 @@ describe("prompt construction", () => {
     expect(result.warnings.some((item) => item.toLowerCase().includes("credential"))).toBe(true);
   });
 
+  it("checks all prompt fields for likely credential material", () => {
+    const result = validatePrompt({ ...emptyDraft, instruction: "Summarize this file carefully", context: "API_KEY: do-not-share" });
+    expect(result.warnings.some((item) => item.toLowerCase().includes("credential"))).toBe(true);
+  });
+
   it("counts words for empty and non-empty inputs", () => {
     expect(countWords("  ")).toBe(0);
     expect(countWords("one two\nthree")).toBe(3);
