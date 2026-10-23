@@ -47,6 +47,7 @@ describe("local prompt evaluation", () => {
     expect(parseEvaluationDataset(exportEvaluationDataset(cases))).toEqual(cases);
     expect(() => parseEvaluationDataset("not-json")).toThrow(/valid JSON/);
     expect(() => parseEvaluationDataset(JSON.stringify({ cases: [{ id: "bad" }] }))).toThrow(/string id/);
+    expect(() => parseEvaluationDataset(JSON.stringify({ cases: [{ id: "x", name: "A", input: "a", expected: "b", actual: "" }, { id: "x", name: "B", input: "c", expected: "d", actual: "" }] }))).toThrow(/unique ID/);
   });
 
   it("loads starter cases when there is no saved dataset", () => {
