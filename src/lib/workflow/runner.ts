@@ -209,7 +209,13 @@ export async function runWorkflow(
         errors.push(node.label + ": reached the maximum of " + node.config.maxIterations + " iterations without passing the deterministic acceptance check.");
       }
     } catch (error) {
-      if (error instanceof Error && error.name === "AbortError") { wasCancelled = true; break; }
+      if (error instanceof Error && error.name === "AbortError") {
+        const cancelled: WorkflowNodeRun = { nodeId, status: "cancelled", input, output: "", durationMs: Date.now() - start, error: error.message };
+        runs.set(nodeId, cancelled);
+        options.onNodeRun?.(cancelled);
+        wasCancelled = true;
+        break;
+      }
       const message = error instanceof Error ? error.message : "Unknown node failure.";
       const failed: WorkflowNodeRun = { nodeId, status: "failed", input, output: "", durationMs: Date.now() - start, error: message };
       runs.set(nodeId, failed);
