@@ -53,6 +53,7 @@ describe("workflow runtime", () => {
     const generate = vi.fn(async () => { controller.abort(); return "done"; });
     const result = await runWorkflow(graph, { inputs: { input: "x" }, generate, signal: controller.signal });
     expect(result.status).toBe("cancelled");
+    expect(result.nodeRuns.find((node) => node.nodeId === "prompt-2")?.status).toBe("cancelled");
   });
 
   it("pauses for a human decision and records an approved edit", async () => {
