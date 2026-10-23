@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import { createLinearWorkflow, createNode, createStarterWorkflow } from "../lib/workflow/graph";
 import { readWorkflowRuns, readWorkflows, writeWorkflowRuns, writeWorkflows } from "../lib/workflow/persistence";
 import { parseWorkflow, serializeWorkflow } from "../lib/workflow/serialization";
-import { runWorkflow, type LocalGenerate } from "../lib/workflow/runner";
+import { runWorkflow, type HumanReviewDecision, type HumanReviewRequest, type LocalGenerate } from "../lib/workflow/runner";
 import { validateWorkflow, workflowHasErrors } from "../lib/workflow/validate";
 import type { WorkflowDefinition, WorkflowNode, WorkflowNodeType, WorkflowRun } from "../lib/workflow/types";
 import { interruptLocalGeneration } from "../lib/local-model";
@@ -12,7 +12,7 @@ type Props = {
   generateLocal: LocalGenerate;
 };
 
-const nodeTypes: WorkflowNodeType[] = ["input", "prompt", "transform", "validator", "router", "merge", "loop", "output"];
+const nodeTypes: WorkflowNodeType[] = ["input", "prompt", "transform", "validator", "router", "merge", "loop", "human-review", "output"];
 
 function idFor(prefix: string): string {
   return prefix + "-" + (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2, 8));
@@ -22,6 +22,7 @@ function portsFor(node?: WorkflowNode): string[] {
   if (node.type === "router") return ["match", "no-match"];
   if (node.type === "validator") return ["pass", "fail"];
   if (node.type === "loop") return ["pass", "limit"];
+  if (node.type === "human-review") return ["approve", "reject"];
   return ["output"];
 }
 function timeLabel(value: string): string {
@@ -46,6 +47,10 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
   const [editorMode, setEditorMode] = useState<"canvas" | "outline">("canvas");
   const [undoStack, setUndoStack] = useState<WorkflowDefinition[]>([]);
   const [redoStack, setRedoStack] = useState<WorkflowDefinition[]>([]);
+  const [pendingReview, setPendingReview] = useState<HumanReviewRequest | null>(null);
+  const [reviewDraft, setReviewDraft] = useState("");
+  const [reviewNote, setReviewNote] = useState("");
+  const reviewResolverRef = useRef<((decision: HumanReviewDecision) => void) | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const selectedNode = workflow.nodes.find((node) => node.id === selectedNodeId);
@@ -104,6 +109,22 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
         position: { ...node.position, [axis]: Math.max(16, Math.min(axis === "x" ? 1700 : 1280, Math.round(value))) }
       } as WorkflowNode : node)
     });
+  };
+  const requestHumanReview = (request: HumanReviewRequest, signal?: AbortSignal) => new Promise<HumanReviewDecision>((resolve) => {
+    if (signal?.aborted) {
+      resolve({ approved: false, cancelled: true });
+      return;
+    }
+    reviewResolverRef.current = resolve;
+    setPendingReview(request);
+    setReviewDraft(request.input);
+    setReviewNote("");
+  });
+  const finishHumanReview = (decision: HumanReviewDecision) => {
+    const resolve = reviewResolverRef.current;
+    reviewResolverRef.current = null;
+    setPendingReview(null);
+    resolve?.(decision);
   };
 
   const addNode = () => {
@@ -242,6 +263,7 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
       const run = await runWorkflow(workflow, {
         inputs,
         signal: controller.signal,
+        review: requestHumanReview,
         generate: modelReady ? async (prompt, systemPrompt, signal) => {
           const effectiveSignal = signal || controller.signal;
           const abort = () => interruptLocalGeneration();
@@ -291,6 +313,7 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
       case "router": return <><div className="field"><label htmlFor="workflow-router-condition">Condition</label><select id="workflow-router-condition" value={node.config.condition} onChange={(event) => updateConfig(node.id, "condition", event.target.value)}>{["contains", "equals", "is-empty"].map((value) => <option key={value}>{value}</option>)}</select></div>{node.config.condition !== "is-empty" ? renderField("value", "Comparison value", node.config.value) : null}</>;
       case "merge": return <><div className="field"><label htmlFor="workflow-merge-strategy">Strategy</label><select id="workflow-merge-strategy" value={node.config.strategy} onChange={(event) => updateConfig(node.id, "strategy", event.target.value)}>{["join", "first-non-empty", "json"].map((value) => <option key={value}>{value}</option>)}</select></div>{node.config.strategy === "join" ? renderField("separator", "Separator", node.config.separator, { rows: 2 }) : null}</>;
       case "loop": return <>{renderField("maxIterations", "Maximum iterations (1–10)", node.config.maxIterations, { type: "number", min: 1, max: 10 })}{renderField("draftInstruction", "Draft instruction", node.config.draftInstruction, { rows: 3 })}{renderField("reviewInstruction", "Review criteria / instructions", node.config.reviewInstruction, { rows: 3 })}{renderField("refineInstruction", "Refinement instruction", node.config.refineInstruction, { rows: 3 })}<div className="field"><label htmlFor="workflow-loop-evaluator">Deterministic stop check</label><select id="workflow-loop-evaluator" value={node.config.evaluator} onChange={(event) => updateConfig(node.id, "evaluator", event.target.value)}>{["non-empty", "contains", "equals", "max-length"].map((value) => <option key={value}>{value}</option>)}</select></div>{node.config.evaluator === "max-length" ? renderField("maxLength", "Maximum length", node.config.maxLength, { type: "number", min: 1, max: 100000 }) : node.config.evaluator !== "non-empty" ? renderField("expectedValue", "Required / expected value", node.config.expectedValue) : null}<p className="field-help">The runner always enforces the iteration limit. Model review text is advisory; only this deterministic check controls the pass/limit port.</p></>;
+      case "human-review": return <>{renderField("instruction", "Reviewer checklist", node.config.instruction, { rows: 4 })}<label className="workflow-checkbox-field"><input type="checkbox" checked={node.config.allowEdit} onChange={(event) => updateConfig(node.id, "allowEdit", event.target.checked ? 1 : 0)} /> Allow the reviewer to edit the output before approval</label><p className="field-help">Execution pauses until a person approves or rejects. Approval and rejection use separate outgoing ports.</p></>;
       case "output": return renderField("displayName", "Output label", node.config.displayName);
     }
   };
@@ -460,13 +483,28 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
       <div className="panel-heading"><div><p className="eyebrow">EXECUTION</p><h2>Run and inspect</h2></div><span className={modelReady ? "status-good" : "status-muted"}>{modelReady ? "Local model ready" : "Model not loaded"}</span></div>
       <p className="muted">Deterministic nodes work without a model. Prompt and loop nodes need the local WebGPU model to be loaded in Local playground.</p>
       <div className="workflow-run-input"><label htmlFor="workflow-input-value">Input value</label><textarea id="workflow-input-value" rows={3} value={inputValue} onChange={(event) => setInputValue(event.target.value)} placeholder="Text passed to each Input node…" /></div>
-      <div className="editor-actions"><button className="button primary" type="button" disabled={running || errors.length > 0} onClick={() => void execute()}>{running ? "Running workflow…" : "Run workflow"}</button>{running ? <button className="button secondary" type="button" onClick={() => { abortRef.current?.abort(); interruptLocalGeneration(); }}>Cancel run</button> : null}<span className="workflow-model-disclaimer">No hosted LLM API is configured.</span></div>
+      <div className="editor-actions"><button className="button primary" type="button" disabled={running || errors.length > 0} onClick={() => void execute()}>{running ? "Running workflow…" : "Run workflow"}</button>{running ? <button className="button secondary" type="button" onClick={() => { abortRef.current?.abort(); interruptLocalGeneration(); if (reviewResolverRef.current) finishHumanReview({ approved: false, cancelled: true }); }}>Cancel run</button> : null}<span className="workflow-model-disclaimer">No hosted LLM API is configured.</span></div>
       {notice ? <div className="workflow-notice" role="status">{notice}</div> : null}
-      {(lastRun || liveRuns.length > 0) && <div className="workflow-trace"><h3>{lastRun ? "Last run · " + runStatusLabel(lastRun.status) : "Live execution trace"}</h3>{(lastRun?.nodeRuns || liveRuns).map((nodeRun) => <article className={"workflow-trace-item " + nodeRun.status} key={nodeRun.nodeId}><div><strong>{workflow.nodes.find((node) => node.id === nodeRun.nodeId)?.label || nodeRun.nodeId}</strong><span>{nodeRun.status} · {nodeRun.durationMs} ms{nodeRun.selectedPort ? " · port: " + nodeRun.selectedPort : ""}</span></div>{nodeRun.error ? <p>{nodeRun.error}</p> : null}{nodeRun.iterations?.length ? <ol>{nodeRun.iterations.map((iteration) => <li key={iteration.attempt}>Attempt {iteration.attempt}: {iteration.passed ? "passed" : "not passed"} · {iteration.candidate.slice(0, 180)}{iteration.candidate.length > 180 ? "…" : ""}<small>{iteration.feedback}</small></li>)}</ol> : null}<pre>{nodeRun.output || (nodeRun.status === "skipped" ? "Skipped because no incoming branch was selected." : "No output")}</pre></article>)}
+      {(lastRun || liveRuns.length > 0) && <div className="workflow-trace"><h3>{lastRun ? "Last run · " + runStatusLabel(lastRun.status) : "Live execution trace"}</h3>{(lastRun?.nodeRuns || liveRuns).map((nodeRun) => <article className={"workflow-trace-item " + nodeRun.status} key={nodeRun.nodeId}><div><strong>{workflow.nodes.find((node) => node.id === nodeRun.nodeId)?.label || nodeRun.nodeId}</strong><span>{nodeRun.status} · {nodeRun.durationMs} ms{nodeRun.selectedPort ? " · port: " + nodeRun.selectedPort : ""}</span></div>{nodeRun.error ? <p>{nodeRun.error}</p> : null}{nodeRun.review ? <p className="workflow-review-result">Human decision: <strong>{nodeRun.review.decision}</strong>{nodeRun.review.note ? " · " + nodeRun.review.note : ""}</p> : null}{nodeRun.iterations?.length ? <ol>{nodeRun.iterations.map((iteration) => <li key={iteration.attempt}>Attempt {iteration.attempt}: {iteration.passed ? "passed" : "not passed"} · {iteration.candidate.slice(0, 180)}{iteration.candidate.length > 180 ? "…" : ""}<small>{iteration.feedback}</small></li>)}</ol> : null}<pre>{nodeRun.output || (nodeRun.status === "skipped" ? "Skipped because no incoming branch was selected." : "No output")}</pre></article>)}
         {lastRun?.errors.map((item) => <p className="check-error" key={item}>! {item}</p>)}
         {lastRun?.output ? <div className="workflow-final-output"><h4>Final output</h4><pre>{lastRun.output}</pre><button className="button secondary" type="button" onClick={() => void navigator.clipboard.writeText(lastRun.output).then(() => setNotice("Final output copied."), () => setNotice("Clipboard permission was blocked."))}>Copy final output</button></div> : null}</div>}
     </section>
 
     <section className="workflow-history-panel"><div className="section-title-row"><div><p className="eyebrow">LOCAL HISTORY</p><h2>Recent workflow runs</h2></div><button type="button" className="text-button" onClick={() => { setHistory([]); writeWorkflowRuns([]); setNotice("Local workflow run history cleared."); }}>Clear history</button></div>{history.length ? history.map((item) => <button key={item.id} type="button" className="workflow-history-item" onClick={() => { setLastRun(item); setLiveRuns(item.nodeRuns); setNotice("Showing a locally saved run snapshot."); }}><span><strong>{item.workflowName}</strong><small>{timeLabel(item.startedAt)}</small></span><span className={"workflow-node-run " + item.status}>{runStatusLabel(item.status)}</span></button>) : <p className="muted">No workflow runs saved yet.</p>}</section>
+    {pendingReview && <div className="workflow-review-backdrop">
+      <section className="workflow-review-dialog" role="dialog" aria-modal="true" aria-labelledby="workflow-review-title">
+        <p className="eyebrow">HUMAN APPROVAL REQUIRED</p>
+        <h2 id="workflow-review-title">{pendingReview.label}</h2>
+        <p className="workflow-review-instruction">{pendingReview.instruction}</p>
+        <div className="workflow-review-source"><h3>Incoming content</h3><pre>{pendingReview.input || "(No incoming content)"}</pre></div>
+        {pendingReview.allowEdit ? <div className="field"><label htmlFor="workflow-review-draft">Review or edit the content</label><textarea id="workflow-review-draft" rows={8} value={reviewDraft} onChange={(event) => setReviewDraft(event.target.value)} /></div> : null}
+        <div className="field"><label htmlFor="workflow-review-note">Review note (optional)</label><textarea id="workflow-review-note" rows={2} value={reviewNote} onChange={(event) => setReviewNote(event.target.value)} placeholder="Why did you approve or reject this output?" /></div>
+        <p className="field-help">Approve continues through the approve edge. Reject follows the reject edge. Cancelling the run stops workflow execution.</p>
+        <div className="workflow-review-actions">
+          <button type="button" className="button secondary danger-outline" onClick={() => finishHumanReview({ approved: false, feedback: reviewNote })}>Reject</button>
+          <button type="button" className="button primary" onClick={() => finishHumanReview({ approved: true, ...(pendingReview.allowEdit ? { output: reviewDraft } : {}), feedback: reviewNote })}>Approve and continue</button>
+        </div>
+      </section>
+    </div>}
   </section>;
 }
