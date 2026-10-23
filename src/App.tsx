@@ -146,7 +146,8 @@ export default function App() {
   setNotice("");
   setEvaluationProgress("Preparing " + runnable.length + " case(s) for local inference…");
   let current = evaluationCases.map((item) => ({ ...item, actual: "" }));
-  let activeCase: { id: string; text: string } | null = null;
+  let activeCaseId = "";
+  let activeCaseText = "";
   updateEvaluationCases(current);
   try {
    for (let index = 0; index < runnable.length; index += 1) {
@@ -154,17 +155,20 @@ export default function App() {
     const testCase = runnable[index];
     setEvaluationProgress("Running case " + (index + 1) + " of " + runnable.length + ": " + testCase.name);
     const testPrompt = buildPrompt({ ...draft, input: testCase.input });
-    activeCase = { id: testCase.id, text: "" };
+    activeCaseId = testCase.id;
+    activeCaseText = "";
     const actual = await generateLocally("", testPrompt, (partial) => {
-     activeCase = { id: testCase.id, text: partial };
+     activeCaseId = testCase.id;
+     activeCaseText = partial;
      setEvaluationCases(current.map((item) => item.id === testCase.id ? { ...item, actual: partial } : item));
     });
     current = current.map((item) => item.id === testCase.id ? { ...item, actual: actual.trim() } : item);
-    activeCase = null;
+    activeCaseId = "";
+    activeCaseText = "";
     updateEvaluationCases(current);
    }
    if (evaluationCancelRef.current) {
-    if (activeCase && activeCase.text.trim()) { const partialCase = activeCase; current = current.map((item) => item.id === partialCase.id ? { ...item, actual: partialCase.text } : item); }
+    if (activeCaseId && activeCaseText.trim()) { current = current.map((item) => item.id === activeCaseId ? { ...item, actual: activeCaseText } : item); }
     updateEvaluationCases(current);
     setEvaluationProgress("Stopped by you. Completed outputs were retained; this partial run was not added to history.");
     return;
@@ -179,7 +183,7 @@ export default function App() {
    const runsSaved = writeEvaluationRuns(nextRuns);
    setEvaluationProgress("Run complete: " + run.matched + " of " + run.completed + " completed outputs exactly matched. This small dataset is a smoke test, not a general quality benchmark." + (runsSaved ? "" : " The run history could not be saved."));
   } catch (error) {
-   if (activeCase && activeCase.text.trim()) { const partialCase = activeCase; current = current.map((item) => item.id === partialCase.id ? { ...item, actual: partialCase.text } : item); }
+   if (activeCaseId && activeCaseText.trim()) { current = current.map((item) => item.id === activeCaseId ? { ...item, actual: activeCaseText } : item); }
    updateEvaluationCases(current);
    if (evaluationCancelRef.current) setEvaluationProgress("Stopped by you. Completed outputs were retained; this partial run was not added to history.");
    else {
