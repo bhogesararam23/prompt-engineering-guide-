@@ -9,7 +9,7 @@ These are release gates, not claims of completion.
 - [ ] Choose a project license and add the intended LICENSE file.
 - [ ] Verify that the local-first CI guard passes against the final branch.
 - [ ] Inspect browser Network tooling during prompt editing, generation, import/export, and API synchronization.
-- [ ] Keep the unauthenticated API bound to localhost; implement authentication, authorization, rate limits, and tenant isolation before public exposure.
+- [ ] For remote deployments, set `PROMPT_GUIDE_API_TOKEN` at minimum; complete account authentication, authorization, tenant isolation, rate limits, and monitoring before public exposure.
 - [ ] Confirm remote prompt transfer only occurs after explicit user action and is HTTPS-only.
 - [ ] Do not store API keys or sensitive prompts in browser local storage.
 
