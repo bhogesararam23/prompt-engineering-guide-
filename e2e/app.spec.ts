@@ -60,7 +60,7 @@ test("advanced techniques are searchable and transfer into Prompt Lab", async ({
   await page.getByRole("button", { name: /Techniques/ }).click();
   await expect(page.getByRole("heading", { name: "Techniques Library" })).toBeVisible();
   await page.getByLabel("SEARCH TECHNIQUES").fill("Graph of Thoughts");
-  const card = page.getByRole("button", { name: /Graph of Thoughts \(research concept\\)/ });
+  const card = page.getByRole("button", { name: /Graph of Thoughts \(research concept\)/ });
   await expect(card).toBeVisible();
   await expect(page.getByText(/Graph workflow prompting is this product's visual orchestration feature/)).toBeVisible();
   await card.click();
