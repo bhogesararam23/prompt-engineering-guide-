@@ -16,6 +16,7 @@ A local-first learning guide and prompt workbench. Learn practical prompting tec
 - Production service worker caches the app shell and same-origin assets for repeat offline visits; API data and remote model weights are deliberately not cached.
 - Optional WebLLM inference using WebGPU-capable browsers, run in a dedicated worker with streamed output and interruption.
 - Optional FastAPI backend with SQLite persistence and deterministic validation.
+- A CI policy guard that fails if known hosted-LLM endpoints, provider SDKs, or exposed Google API keys return to active app files.
 - TypeScript checks, unit tests, API tests, and CI workflow.
 
 ## Frontend setup
@@ -30,6 +31,7 @@ npm run dev
 Open the local URL printed by Vite, normally http://localhost:5173.
 
 ~~~sh
+npm run check:local-first
 npm run typecheck
 npm test
 npm run build
