@@ -44,9 +44,25 @@ export function exportPrompts(prompts: SavedPrompt[]): string {
  return JSON.stringify({ schemaVersion: 1, exportedAt: new Date().toISOString(), prompts }, null, 2);
 }
 export function parsePromptExport(raw: string): SavedPrompt[] {
- const data: unknown = JSON.parse(raw);
+ let data: unknown;
+ try { data = JSON.parse(raw); }
+ catch { throw new Error("This file is not valid JSON."); }
  if (!data || typeof data !== "object" || !("prompts" in data) || !Array.isArray(data.prompts)) throw new Error("This file is not a Prompt Engineering Guide export.");
  const prompts = data.prompts as unknown[];
- if (!prompts.every((x) => !!x && typeof x === "object" && "id" in x && typeof x.id === "string" && "title" in x && typeof x.title === "string" && "content" in x && typeof x.content === "string" && "createdAt" in x && typeof x.createdAt === "string")) throw new Error("The export contains an invalid prompt record.");
+ if (prompts.length > 1000) throw new Error("A prompt library import may contain at most 1,000 records.");
+ const valid = prompts.every((x) => !!x && typeof x === "object" && "id" in x && typeof x.id === "string" && x.id.length <= 200 && "title" in x && typeof x.title === "string" && x.title.trim().length > 0 && x.title.length <= 120 && "content" in x && typeof x.content === "string" && x.content.trim().length > 0 && x.content.length <= 100_000 && "createdAt" in x && typeof x.createdAt === "string" && x.createdAt.length <= 100);
+ if (!valid) throw new Error("The export contains an invalid prompt record or a field exceeds its limit.");
  return prompts as SavedPrompt[];
+}
+
+export function mergeImportedPrompts(existing: SavedPrompt[], incoming: SavedPrompt[]): SavedPrompt[] {
+ const seenIds = new Set(existing.map((item) => item.id));
+ const safe = incoming.map((item) => {
+  let id = item.id;
+  let suffix = 0;
+  while (seenIds.has(id)) { id = item.id + "-import-" + Date.now() + "-" + suffix; suffix += 1; }
+  seenIds.add(id);
+  return { ...item, id };
+ });
+ return [...safe, ...existing];
 }
