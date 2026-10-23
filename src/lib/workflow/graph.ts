@@ -106,7 +106,8 @@ export function createLinearWorkflow(types: WorkflowNodeType[], name: string): W
     const target = nodes[index + 1];
     const ports = source.type === "router" ? ["match", "no-match"] :
       source.type === "validator" ? ["pass", "fail"] :
-      source.type === "loop" ? ["pass", "limit"] : [undefined];
+      source.type === "loop" ? ["pass", "limit"] :
+      source.type === "human-review" ? ["approve", "reject"] : [undefined];
     for (const [portIndex, fromPort] of ports.entries()) {
       edges.push({
         id: `edge-${index + 1}-${portIndex + 1}`,
