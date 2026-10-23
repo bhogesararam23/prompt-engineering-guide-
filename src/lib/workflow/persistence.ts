@@ -35,19 +35,20 @@ export function readWorkflowRuns(): import("./types").WorkflowRun[] {
     if (!raw || raw.length > MAX_RUN_HISTORY_CHARS) return [];
     const value: unknown = JSON.parse(raw);
     if (!Array.isArray(value)) return [];
-    return value.filter((item): item is import("./types").WorkflowRun =>
-      !!item && typeof item === "object" &&
-      typeof item.id === "string" && typeof item.workflowId === "string" &&
-      typeof item.workflowName === "string" && typeof item.startedAt === "string" &&
-      typeof item.finishedAt === "string" && ["success", "failed", "cancelled"].includes(String(item.status)) &&
-      typeof item.output === "string" && Array.isArray(item.nodeRuns) &&
-      item.nodeRuns.every((run: unknown) => !!run && typeof run === "object" &&
-        typeof (run as Record<string, unknown>).nodeId === "string" &&
-        ["success", "failed", "skipped"].includes(String((run as Record<string, unknown>).status)) &&
-        typeof (run as Record<string, unknown>).input === "string" &&
-        typeof (run as Record<string, unknown>).output === "string") &&
-      Array.isArray(item.errors) && item.errors.every((error: unknown) => typeof error === "string")
-    ).slice(0, MAX_SAVED_RUNS);
+    return value.filter((item): item is import("./types").WorkflowRun => {
+      if (!item || typeof item !== "object") return false;
+      const row = item as Record<string, unknown>;
+      return typeof row.id === "string" && typeof row.workflowId === "string" &&
+        typeof row.workflowName === "string" && typeof row.startedAt === "string" &&
+        typeof row.finishedAt === "string" && ["success", "failed", "cancelled"].includes(String(row.status)) &&
+        typeof row.output === "string" && Array.isArray(row.nodeRuns) &&
+        row.nodeRuns.every((run: unknown) => !!run && typeof run === "object" &&
+          typeof (run as Record<string, unknown>).nodeId === "string" &&
+          ["success", "failed", "skipped"].includes(String((run as Record<string, unknown>).status)) &&
+          typeof (run as Record<string, unknown>).input === "string" &&
+          typeof (run as Record<string, unknown>).output === "string") &&
+        Array.isArray(row.errors) && row.errors.every((error: unknown) => typeof error === "string");
+    }).slice(0, MAX_SAVED_RUNS);
   } catch {
     return [];
   }
