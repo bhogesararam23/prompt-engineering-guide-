@@ -73,8 +73,11 @@ The full specification is in [Advanced Prompting and Workflow Builder Specificat
 - [x] Add an accessible workflow outline, node inspector, branch-port editor, run traces, and a model-free starter graph.
 - [x] Add unit and Playwright coverage for catalog links, malformed workflow graphs, bounded loops, persistence, cancellation, and model-free user journeys.
 - [ ] Verify CI on the exact current feature-branch head.
-- [x] Add a draggable node canvas with SVG connection paths, saved positions, an auto-arrange action, and an accessible Outline fallback.
-- [ ] Add undo/redo for canvas moves, node edits, and edge changes.
+- [x] Add a draggable node canvas with SVG connection paths, saved positions, an auto-arrange action, numeric position controls, and an accessible Outline fallback.
+- [x] Add bounded undo/redo history for node edits, connection changes, and canvas positioning.
+- [x] Add a Human Review node with approve/reject ports, optional edited output, reviewer notes, and auditable trace data.
+- [x] Add workflow evaluation against portable local datasets with per-case results, deterministic match rules, snapshots, cancellation, and local run history.
+- [x] Add E2E coverage for canvas/outline editing, undo/redo, workflow evaluation, and interactive human review.
 - [ ] Review all source statements and re-check living provider documentation immediately before release.
 - [ ] Audit keyboard/screen-reader behavior and mobile workflow editing.
 - [ ] Verify local-model runtime compatibility and memory behavior on real supported WebGPU devices.
