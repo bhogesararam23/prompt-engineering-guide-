@@ -21,7 +21,7 @@ describe("advanced techniques catalog", () => {
     expect(urls.some((url) => url.includes("platform.claude.com") || url.includes("anthropic.com"))).toBe(true);
     expect(urls.some((url) => url.includes("ai.google.dev"))).toBe(true);
     expect(urls.some((url) => url.includes("ojs.aaai.org"))).toBe(true);
-    for (const item of techniques) for (const source of item.sources) expect(source.url).toMatch(/^https:///);
+    for (const item of techniques) for (const source of item.sources) expect(source.url.startsWith("https://")).toBe(true);
   });
 
   it("distinguishes product graph workflows from Graph of Thoughts research", () => {
