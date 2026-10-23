@@ -31,6 +31,20 @@ test("Prompt Lab saves two snapshots and compares them", async ({ page }) => {
   await expect(page.locator(".diff-view .diff-removed")).toBeVisible();
 });
 
+
+test("lesson knowledge checks are deterministic and persist locally", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Learning guide/ }).click();
+  await expect(page.getByRole("heading", { name: "Test your understanding" })).toBeVisible();
+  await page.getByLabel("Return exactly five bullets and include one caveat.").check();
+  await page.getByRole("button", { name: "Check answer" }).click();
+  await expect(page.getByText("Correct", { exact: true })).toBeVisible();
+  await page.reload();
+  await page.getByRole("button", { name: /Learning guide/ }).click();
+  await expect(page.getByText("PASSED", { exact: true })).toBeVisible();
+  await expect(page.getByText("A fixed count and an explicit required element can be checked directly.", { exact: false })).toBeVisible();
+});
+
 test("evaluation bench and dataset controls work without loading a model", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /Evaluation bench/ }).click();
