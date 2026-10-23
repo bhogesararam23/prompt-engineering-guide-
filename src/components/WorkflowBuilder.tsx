@@ -95,6 +95,16 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
       config: { ...node.config, [key]: value }
     } as WorkflowNode : node)
   });
+  const updatePosition = (nodeId: string, axis: "x" | "y", value: number) => {
+    if (!Number.isFinite(value)) return;
+    updateWorkflow({
+      ...workflow,
+      nodes: workflow.nodes.map((node) => node.id === nodeId ? {
+        ...node,
+        position: { ...node.position, [axis]: Math.max(16, Math.min(axis === "x" ? 1700 : 1280, Math.round(value))) }
+      } as WorkflowNode : node)
+    });
+  };
 
   const addNode = () => {
     const node = createNode(newNodeType, workflow.nodes.length + 1);
@@ -434,6 +444,10 @@ export default function WorkflowBuilder({ modelReady, generateLocal }: Props) {
         {selectedNode ? <>
           <div className="field"><label htmlFor="workflow-node-label">Node label</label><input id="workflow-node-label" value={selectedNode.label} onChange={(event) => updateNodeLabel(selectedNode.id, event.target.value)} /></div>
           <p className="workflow-node-id inspector-id">{selectedNode.type} · {selectedNode.id}</p>
+          <div className="workflow-position-fields">
+            <div className="field"><label htmlFor="workflow-position-x">Canvas X</label><input id="workflow-position-x" type="number" min={16} max={1700} value={selectedNode.position.x} onChange={(event) => updatePosition(selectedNode.id, "x", Number(event.target.value))} /></div>
+            <div className="field"><label htmlFor="workflow-position-y">Canvas Y</label><input id="workflow-position-y" type="number" min={16} max={1280} value={selectedNode.position.y} onChange={(event) => updatePosition(selectedNode.id, "y", Number(event.target.value))} /></div>
+          </div>
           {renderConfig(selectedNode)}
           <button className="button secondary danger-outline" type="button" onClick={() => removeNode(selectedNode.id)}>Remove node</button>
         </> : <p className="muted">Select a node card to edit its configuration.</p>}
