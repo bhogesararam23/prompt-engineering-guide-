@@ -21,7 +21,8 @@ export function validatePrompt(draft: PromptDraft): { errors: string[]; warnings
  if (draft.instruction.trim() && draft.instruction.trim().length < 12) warnings.push("The task is very short. Check whether the intended action is unambiguous.");
  if (!draft.input.trim() && !draft.context.trim()) warnings.push("There is no input data or context. Check whether the model has enough information.");
  if (!draft.outputFormat.trim()) warnings.push("No output format is specified. Add one when consistency matters.");
- if (/api[_ -]?key|password|secret\s*[:=]/i.test(draft.input)) warnings.push("The input may contain a credential. Remove secrets before sharing or processing this prompt.");
+ const promptFields = [draft.role, draft.instruction, draft.context, draft.examples, draft.input, draft.constraints, draft.outputFormat].join("\n");
+ if (/api[_ -]?key|access[_ -]?token|password|secret\s*[:=]/i.test(promptFields)) warnings.push("One or more prompt fields may contain a credential. Remove secrets before sharing or processing this prompt.");
  return { errors, warnings };
 }
 export function countWords(text: string): number { const value = text.trim(); return value ? value.split(/\s+/).length : 0; }
