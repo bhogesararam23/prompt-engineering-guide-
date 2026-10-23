@@ -51,13 +51,21 @@ export async function uploadMissingPrompts(base: string, local: SavedPrompt[]): 
 }
 
 export function mergeApiPrompts(local: SavedPrompt[], remote: ApiPrompt[]): SavedPrompt[] {
-  const seen = new Set(local.map((item) => item.title + "\n" + item.content));
+  const seenContent = new Set(local.map((item) => item.title + "\n" + item.content));
+  const seenIds = new Set(local.map((item) => item.id));
   const additions: SavedPrompt[] = [];
   for (const item of remote) {
-    const key = item.title + "\n" + item.content;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    additions.push({ id: item.id, title: item.title, content: item.content, createdAt: item.created_at });
+    const contentKey = item.title + "\n" + item.content;
+    if (seenContent.has(contentKey)) continue;
+    seenContent.add(contentKey);
+    let id = item.id;
+    let suffix = 0;
+    while (seenIds.has(id)) {
+      id = item.id + "-remote-" + suffix;
+      suffix += 1;
+    }
+    seenIds.add(id);
+    additions.push({ id, title: item.title, content: item.content, createdAt: item.created_at });
   }
   return [...additions, ...local];
 }
