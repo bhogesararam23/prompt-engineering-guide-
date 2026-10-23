@@ -1,7 +1,7 @@
 import type { SavedPrompt } from "./prompts";
 
 export type ApiPrompt = { id: string; title: string; content: string; created_at: string };
-export type ApiHealth = { status: string; service?: string; llm?: string };
+export type ApiHealth = { status: string; service?: string; llm?: string; auth_required?: boolean };
 
 export function normalizeApiBase(value: string): string {
   let url: URL;
@@ -14,8 +14,10 @@ export function normalizeApiBase(value: string): string {
   return url.toString().replace(/\/+$/, "");
 }
 
-async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(url, init);
+async function requestJson<T>(url: string, init?: RequestInit, token = ""): Promise<T> {
+  const headers = new Headers(init?.headers);
+  if (token.trim()) headers.set("Authorization", "Bearer " + token.trim());
+  const response = await fetch(url, { ...init, headers });
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
     throw new Error("API request failed (" + response.status + "). " + detail.slice(0, 240));
@@ -27,13 +29,13 @@ export async function checkApi(base: string): Promise<ApiHealth> {
   return requestJson<ApiHealth>(normalizeApiBase(base) + "/api/health");
 }
 
-export async function listApiPrompts(base: string): Promise<ApiPrompt[]> {
-  return requestJson<ApiPrompt[]>(normalizeApiBase(base) + "/api/v1/prompts?limit=500");
+export async function listApiPrompts(base: string, token = ""): Promise<ApiPrompt[]> {
+  return requestJson<ApiPrompt[]>(normalizeApiBase(base) + "/api/v1/prompts?limit=500", undefined, token);
 }
 
-export async function uploadMissingPrompts(base: string, local: SavedPrompt[]): Promise<number> {
+export async function uploadMissingPrompts(base: string, local: SavedPrompt[], token = ""): Promise<number> {
   const root = normalizeApiBase(base);
-  const remote = await listApiPrompts(root);
+  const remote = await listApiPrompts(root, token);
   const seen = new Set(remote.map((item) => item.title + "\n" + item.content));
   let added = 0;
   for (const item of local) {
@@ -43,7 +45,7 @@ export async function uploadMissingPrompts(base: string, local: SavedPrompt[]): 
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: item.title, content: item.content })
-    });
+    }, token);
     seen.add(key);
     added += 1;
   }
