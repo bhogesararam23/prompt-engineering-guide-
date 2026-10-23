@@ -1,0 +1,42 @@
+name: Bug report
+description: Report a reproducible problem in the guide, Prompt Lab, local playground, or optional API.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: "Do not include credentials, private prompts, personal data, or model files in an issue."
+  - type: input
+    id: area
+    attributes:
+      label: Affected area
+      description: Guide, Prompt Lab, Library, Evaluation bench, Local playground, or API.
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: What happened?
+      description: Include the exact error message, excluding secrets.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Open ...\n2. Select ...\n3. Observe ..."
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser and version, OS, Node/Python version, and whether WebGPU is available.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
