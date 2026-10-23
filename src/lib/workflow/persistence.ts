@@ -44,7 +44,7 @@ export function readWorkflowRuns(): import("./types").WorkflowRun[] {
         typeof row.output === "string" && Array.isArray(row.nodeRuns) &&
         row.nodeRuns.every((run: unknown) => !!run && typeof run === "object" &&
           typeof (run as Record<string, unknown>).nodeId === "string" &&
-          ["success", "failed", "skipped"].includes(String((run as Record<string, unknown>).status)) &&
+          ["success", "failed", "skipped", "cancelled"].includes(String((run as Record<string, unknown>).status)) &&
           typeof (run as Record<string, unknown>).input === "string" &&
           typeof (run as Record<string, unknown>).output === "string") &&
         Array.isArray(row.errors) && row.errors.every((error: unknown) => typeof error === "string");
