@@ -6,14 +6,16 @@ from pathlib import Path
 import os
 import re
 import sqlite3
+import hmac
 from uuid import uuid4
 
-from fastapi import FastAPI, HTTPException, Query, Response
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parents[1] / "data" / "prompts.sqlite3"
 DB_PATH = Path(os.environ.get("PROMPT_GUIDE_DB_PATH", str(DEFAULT_DB_PATH)))
+API_TOKEN = os.environ.get("PROMPT_GUIDE_API_TOKEN", "").strip()
 
 
 class PromptCreate(BaseModel):
@@ -91,16 +93,35 @@ app.add_middleware(
     allow_origins=origins,
     allow_credentials=False,
     allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 
+def require_api_access(authorization: str | None = Header(default=None)) -> None:
+    """Require a configured bearer token; default local development can remain tokenless."""
+    if not API_TOKEN:
+        return
+    expected = "Bearer " + API_TOKEN
+    supplied = authorization or ""
+    if not hmac.compare_digest(supplied, expected):
+        raise HTTPException(
+            status_code=401,
+            detail="A valid bearer token is required for this API.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
 @app.get("/api/health")
-def health() -> dict[str, str]:
-    return {"status": "ok", "service": "prompt-engineering-guide-api", "llm": "not-configured"}
+def health() -> dict[str, object]:
+    return {
+        "status": "ok",
+        "service": "prompt-engineering-guide-api",
+        "llm": "not-configured",
+        "auth_required": bool(API_TOKEN),
+    }
 
 
-@app.post("/api/v1/prompts/validate", response_model=PromptCheckOutput)
+@app.post("/api/v1/prompts/validate", response_model=PromptCheckOutput, dependencies=[Depends(require_api_access)])
 def validate_prompt(payload: PromptCheckInput) -> PromptCheckOutput:
     errors: list[str] = []
     warnings: list[str] = []
@@ -121,7 +142,7 @@ def validate_prompt(payload: PromptCheckInput) -> PromptCheckOutput:
     return PromptCheckOutput(errors=errors, warnings=warnings)
 
 
-@app.get("/api/v1/prompts", response_model=list[PromptRecord])
+@app.get("/api/v1/prompts", response_model=list[PromptRecord], dependencies=[Depends(require_api_access)])
 def list_prompts(limit: int = Query(default=100, ge=1, le=500)) -> list[PromptRecord]:
     conn = get_connection()
     try:
@@ -134,7 +155,7 @@ def list_prompts(limit: int = Query(default=100, ge=1, le=500)) -> list[PromptRe
         conn.close()
 
 
-@app.post("/api/v1/prompts", response_model=PromptRecord, status_code=201)
+@app.post("/api/v1/prompts", response_model=PromptRecord, status_code=201, dependencies=[Depends(require_api_access)])
 def create_prompt(payload: PromptCreate) -> PromptRecord:
     title = payload.title.strip()
     content = payload.content.strip()
@@ -159,7 +180,7 @@ def create_prompt(payload: PromptCreate) -> PromptRecord:
     return record
 
 
-@app.delete("/api/v1/prompts/{prompt_id}", status_code=204)
+@app.delete("/api/v1/prompts/{prompt_id}", status_code=204, dependencies=[Depends(require_api_access)])
 def delete_prompt(prompt_id: str) -> Response:
     conn = get_connection()
     try:
