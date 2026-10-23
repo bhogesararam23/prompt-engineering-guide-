@@ -43,6 +43,14 @@ export function reachableNodeIds(workflow: WorkflowDefinition, startId = workflo
   return seen;
 }
 
+export function createNode(type: "input", index: number): Extract<WorkflowNode, { type: "input" }>;
+export function createNode(type: "prompt", index: number): Extract<WorkflowNode, { type: "prompt" }>;
+export function createNode(type: "transform", index: number): Extract<WorkflowNode, { type: "transform" }>;
+export function createNode(type: "validator", index: number): Extract<WorkflowNode, { type: "validator" }>;
+export function createNode(type: "router", index: number): Extract<WorkflowNode, { type: "router" }>;
+export function createNode(type: "merge", index: number): Extract<WorkflowNode, { type: "merge" }>;
+export function createNode(type: "loop", index: number): Extract<WorkflowNode, { type: "loop" }>;
+export function createNode(type: "output", index: number): Extract<WorkflowNode, { type: "output" }>;
 export function createNode(type: WorkflowNodeType, index: number): WorkflowNode {
   const base = { id: `${type}-${index}`, label: type[0].toUpperCase() + type.slice(1), position: { x: 80 + (index % 4) * 210, y: 80 + Math.floor(index / 4) * 150 } };
   switch (type) {
