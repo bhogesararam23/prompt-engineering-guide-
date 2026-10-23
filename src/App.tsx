@@ -86,7 +86,7 @@ export default function App() {
  };
  const importLibrary = async (file?: File) => {
   if (!file) return;
-  try { const incoming = parsePromptExport(await file.text()); const ids = new Set(saved.map((x) => x.id)); const safe = incoming.map((x) => ids.has(x.id) ? { ...x, id: x.id + "-import-" + Date.now() } : x); setLibrary([...safe, ...saved]); setNotice("Imported " + safe.length + " prompt(s). Review imported text before using it."); }
+  try { const incoming = parsePromptExport(await file.text()); const ids = new Set(saved.map((x) => x.id)); const safe = incoming.map((item) => { let id = item.id; let suffix = 0; while (ids.has(id)) { id = item.id + "-import-" + Date.now() + "-" + suffix; suffix += 1; } ids.add(id); return { ...item, id }; }); setLibrary([...safe, ...saved]); setNotice("Imported " + safe.length + " prompt(s). Review imported text before using it."); }
   catch (error) { setNotice(error instanceof Error ? error.message : "Could not import this file."); }
  };
  const updateEvaluationCases = (next: EvaluationCase[]) => {
