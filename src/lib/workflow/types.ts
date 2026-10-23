@@ -1,4 +1,4 @@
-export type WorkflowNodeType = "input" | "prompt" | "transform" | "validator" | "router" | "merge" | "loop" | "output";
+export type WorkflowNodeType = "input" | "prompt" | "transform" | "validator" | "router" | "merge" | "loop" | "human-review" | "output";
 export type Position = { x: number; y: number };
 export type NodeBase<T extends WorkflowNodeType, C> = { id: string; type: T; label: string; position: Position; config: C };
 
@@ -17,8 +17,9 @@ export type LoopNode = NodeBase<"loop", {
   expectedValue?: string;
   maxLength?: number;
 }>;
+export type HumanReviewNode = NodeBase<"human-review", { instruction: string; allowEdit: boolean }>;
 export type OutputNode = NodeBase<"output", { displayName?: string }>;
-export type WorkflowNode = InputNode | PromptNode | TransformNode | ValidatorNode | RouterNode | MergeNode | LoopNode | OutputNode;
+export type WorkflowNode = InputNode | PromptNode | TransformNode | ValidatorNode | RouterNode | MergeNode | LoopNode | HumanReviewNode | OutputNode;
 
 export type WorkflowEdge = {
   id: string;
@@ -48,6 +49,7 @@ export type WorkflowNodeRun = {
   selectedPort?: string;
   error?: string;
   iterations?: Array<{ attempt: number; candidate: string; passed: boolean; feedback: string }>;
+  review?: { decision: "approve" | "reject"; note: string };
 };
 export type WorkflowRun = {
   id: string;
