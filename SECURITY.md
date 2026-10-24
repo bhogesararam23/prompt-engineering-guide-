@@ -6,7 +6,8 @@
 - Browser local storage is not encrypted; treat it as convenience storage, not a secure vault.
 - Do not paste private data into prompts unless you have permission and understand the processing path.
 - First-time local-model installation may access a model source; inference itself is performed in the browser.
-- The optional API has no authentication and should remain bound to localhost.
+- The optional API is unauthenticated by default. It can require one shared bearer token when `PROMPT_GUIDE_API_TOKEN` is configured, but this is not account authentication, tenant isolation, or a production identity system.
+- Keep the API bound to localhost unless a separate threat-model review and appropriate deployment controls are completed.
 - Any future sync, public deployment, accounts, or privileged tools require a separate threat model.
 
 ## Incident response
