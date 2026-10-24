@@ -4,8 +4,8 @@ These are release gates, not claims of completion.
 
 ## Security and privacy
 
-- [ ] Revoke or rotate the Google provider credential embedded in the legacy main-branch HTML. A code change is not credential revocation.
-- [ ] Decide whether Git history must be rewritten to remove the exposed secret; rotate first, coordinate with forks/clones, and follow GitHub's sensitive-data guidance.
+- [ ] Confirm the Google provider credential referenced by the legacy implementation has been revoked. Updating or deleting source code does not revoke a credential.
+- [ ] If a secret remains in reachable Git history, rotate it first and follow GitHub's sensitive-data-removal guidance; coordinate with forks and clones.
 - [ ] Choose a project license and add the intended LICENSE file.
 - [ ] Verify that the local-first CI guard passes against the final branch.
 - [ ] Inspect browser Network tooling during prompt editing, generation, import/export, and API synchronization.
