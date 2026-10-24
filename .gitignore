@@ -12,3 +12,20 @@ backend/data/
 .DS_Store
 .vscode/
 .idea/
+
+# Vite and TypeScript
+.vite/
+*.tsbuildinfo
+
+# Playwright
+playwright-report/
+test-results/
+
+# Python tooling and coverage
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# Logs
+*.log
