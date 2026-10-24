@@ -24,7 +24,7 @@ A learning-first guide to prompt engineering: understand prompting techniques, l
 
 ## Frontend setup
 
-Requirements: Node.js 20.19 or newer and npm.
+Requirements: Node.js 22.12.0 or newer, or Node.js 20.19.x, plus npm.
 
 ~~~sh
 npm install
