@@ -1,30 +1,26 @@
 # Prompt Engineering Guide
 
-A local-first learning guide and prompt workbench. Learn practical prompting techniques, compose structured prompts, validate them with deterministic rules, save prompts in the browser, and optionally run a small language model directly in-browser.
+A learning-first guide to prompt engineering: understand prompting techniques, learn how to improve and evaluate prompts, and apply the right patterns to real tasks. The long-term direction is a professional, source-linked learning publication with task-focused lessons and maintained guides for major AI products.
 
 **No hosted LLM API is configured. No model API key is required.** The guide, Prompt Lab, validation tools, and browser library work without loading a model.
 
-## Features
+## Current learning experience
 
 - Eight source-linked learning modules with examples and deterministic knowledge checks whose attempts are saved locally.
-- Advanced Techniques Library with 12 sourced technique cards covering prompt structure, few-shot prompting, chaining, bounded refinement, evaluation flywheels, routing, parallel aggregation, graph workflows, and Graph of Thoughts research.
-- Graph & Loop Builder with a draggable canvas, SVG connections, coordinate editing, auto-arrange, undo/redo, an accessible Outline mode, typed node configuration, graph diagnostics, and validated local JSON import/export.
-- Workflow execution with deterministic input, transformation, validation, routing, merge, output, and human-review nodes. Independent DAG branches are scheduled in parallel waves and merges retain a stable edge order. Model generation and review handlers are serialized by default for single-worker/browser-dialog safety; explicitly concurrency-safe handlers can opt in to parallel calls. Human review pauses for an explicit approve/reject decision, can accept a reviewed edit, records a decision note, and resolves cleanly when cancelled.
-- Prompt and bounded loop nodes require the explicitly loaded local model; no hosted LLM API is configured.
-- A workflow Evaluation Bench with editable datasets, exact/contains/non-empty match rules, per-case outputs, workflow/dataset snapshots, progress and cancellation, local run history, and dataset/run JSON export/import. Human-review workflows cannot be evaluated unattended.
-- Bounded self-correction nodes with a hard limit of 1–10 attempts, deterministic acceptance checks, visible iteration traces, cancellation, and local run history.
-- Prompt Lab for role, task, context, examples, input, constraints, and output format.
-- Deterministic prompt assembly and basic validation; previews do not call an LLM.
-- An evaluation bench with editable test cases, exact-match scoring, locally generated outputs, cancellation, export/import, and saved prompt/dataset snapshots.
-- Reusable templates for summarization, structured extraction, code review, and comparison.
-- Browser-local prompt library with JSON import/export, ID-safe import merging, and side-by-side saved-version line diffs.
-- Lesson completion and bookmarks persisted locally, with a learning-progress overview.
-- Production service worker caches the app shell and same-origin assets for repeat offline visits; API data and remote model weights are deliberately not cached.
-- Optional WebLLM inference using WebGPU-capable browsers, run in a dedicated worker with streamed output and interruption.
-- Optional FastAPI backend with SQLite persistence and deterministic validation.
-- A CI policy guard that fails if known hosted-LLM endpoints, provider SDKs, or exposed Google API keys return to active app files.
-- Playwright smoke tests for the main model-free user journeys and a production app-shell cache for repeat offline visits.
-- TypeScript checks, unit tests, API tests, and CI workflow.
+- An Advanced Techniques Library with 12 sourced technique cards and practical examples.
+- Lesson completion, bookmarks, and local learning-progress overview.
+- A browser-local prompt library, structured Prompt Lab, reusable templates, and prompt-version comparisons for optional practice.
+- The learning pages work without loading a model, entering an API key, or connecting to a hosted LLM service.
+
+## Supporting practice and engineering features
+
+- An optional Graph & Loop Builder with graph validation, import/export, undo/redo, bounded loops, and human-review steps.
+- A local workflow Evaluation Bench with editable datasets, per-case traces, deterministic match rules, cancellation, and local run history.
+- Optional WebLLM inference in a browser worker; model assets may require substantial first-time downloads and compatible WebGPU hardware.
+- An optional FastAPI/SQLite backend for explicitly managed prompt storage. It does not proxy a hosted LLM.
+- CI checks for the local-first policy, TypeScript, unit tests, production build, Playwright journeys, and backend tests.
+
+**Product direction:** the main goal is to become a professional learning site for prompt engineering. The task library, role-based paths, richer technique curriculum, and maintained company/product guides are planned—not claimed as complete. See the [learning-platform roadmap](docs/LEARNING_PLATFORM_ROADMAP.md).
 
 ## Frontend setup
 
@@ -61,7 +57,9 @@ The API stores prompts in a local SQLite database and provides health and determ
 
 - docs/ARCHITECTURE.md — application boundaries and data flow.
 - docs/BACKEND.md — backend setup and endpoint reference.
-- docs/ROADMAP.md — milestones, exit gates, and known unfinished work.
+- docs/ROADMAP.md — current product-roadmap entry point.
+- docs/LEARNING_PLATFORM_ROADMAP.md — detailed learning-first strategy, competitor benchmark, curriculum, company-specific guides, content standards, UX, SEO, monetization, metrics, and phased exit gates.
+- docs/ENGINEERING_ROADMAP.md — supporting technical milestones for the existing implementation; this does not supersede the learning-first product strategy.
 - docs/ADVANCED_PROMPTING_SPEC.md — source-linked specification for advanced techniques, loop behavior, workflow graph semantics, safety, and release criteria.
 - SECURITY.md — data handling and security expectations.
 - CONTRIBUTING.md — development and contribution workflow.
