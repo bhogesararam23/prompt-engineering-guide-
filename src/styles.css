@@ -34,3 +34,10 @@
 @media(max-width:750px){.workflow-eval-cases{grid-template-columns:1fr}.workflow-eval-expected{grid-template-columns:1fr}.workflow-eval-toolbar .button{flex:1}.workflow-evaluation-panel{padding:12px}}
 
 .workflow-eval-trace{margin-top:10px;border-top:1px solid #30343d;padding-top:8px}.workflow-eval-trace summary{cursor:pointer;color:#b8c0ce;font-size:10px}.workflow-eval-trace-node{margin-top:8px;padding:9px;border:1px solid #2f333c;border-radius:5px;background:#0c0e12}.workflow-eval-trace-node>div{display:flex;align-items:center;justify-content:space-between;gap:8px}.workflow-eval-trace-node>div strong{font:9px var(--mono);overflow-wrap:anywhere}.workflow-eval-trace-node>p{font-size:9px;color:#a4a9b6}.workflow-eval-trace-node>pre{max-height:120px;overflow:auto;margin:7px 0 0;color:#c6cbd7;white-space:pre-wrap;overflow-wrap:anywhere;font:9px/1.6 var(--mono)}
+
+
+/* Keyboard access and landmark navigation */
+.skip-link{position:fixed;z-index:2000;top:10px;left:10px;transform:translateY(calc(-100% - 14px));padding:11px 15px;border:2px solid var(--accent);border-radius:6px;color:#10120c;background:var(--accent);font-size:12px;font-weight:800;text-decoration:none;box-shadow:0 6px 24px #0008}
+.skip-link:focus{transform:translateY(0);outline:3px solid #fff;outline-offset:3px}
+.main-content:focus{outline:none}
+.nav-item:focus-visible,.button:focus-visible,.text-button:focus-visible,.disclosure-button:focus-visible,.category-list button:focus-visible,.lesson-list-item:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
