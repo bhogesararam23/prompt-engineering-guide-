@@ -17,6 +17,12 @@ The older implementation-focused roadmap has been preserved as the [Engineering 
 5. **Expand based on evidence** — build the technique encyclopedia, task library, and first-party-sourced product guides using learner research and the editorial gates in the detailed roadmap.
 6. **Harden before growth or monetization** — test accessibility, crawlability, mobile reading, quality, privacy, licensing, and production reliability. Treat advertising as a later experiment, not the reason to publish shallow content.
 
+## Phase 1 implementation checkpoint
+
+The lesson-navigation foundation now includes a structured metadata contract for all eight lessons (learning outcomes, prerequisite IDs, related lesson IDs, and the next lesson), shareable query-based lesson URLs, section anchors/table of contents, breadcrumbs, and previous/next navigation. Catalogue and URL helpers have automated integrity tests, and the browser suite covers direct entry, table-of-contents navigation, and continuing to the next lesson.
+
+This is a first slice of Phase 1—not a claim that the phase exit gate is complete. Remaining work includes a fuller mobile/keyboard/screen-reader audit, route-level page metadata and crawlability decisions, content review dates/ownership, and usability feedback from learners.
+
 ## Rules for prioritization
 
 - Every new feature must improve learning, content discovery, practice, trust, accessibility, or maintainability.
