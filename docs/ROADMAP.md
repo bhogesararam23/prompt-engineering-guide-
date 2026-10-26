@@ -28,3 +28,13 @@ The older implementation-focused roadmap has been preserved as the [Engineering 
 - Mark a phase complete only when its documented exit gate is met.
 
 **North-star outcome:** learners can choose a suitable prompting approach for a real task, explain why it fits, assess the result against clear criteria, improve a failing prompt, and recognize when human review or a different solution is required.
+
+
+## Accessibility implementation checkpoint
+
+- Added a keyboard-visible skip link that targets the main content landmark.
+- Exposed the selected workspace destination with `aria-current="page"`, rather than relying on color alone.
+- Added explicit visible focus styling for primary workspace controls.
+- Added a Playwright keyboard journey for skip navigation and current-page semantics.
+
+This is a targeted first pass, not a claim of WCAG conformance. A complete screen-reader, contrast, reduced-motion, mobile keyboard, and real assistive-technology audit remains required.
