@@ -32,8 +32,8 @@ test("lesson routes expose learning objectives, prerequisites, contents, and nex
   await expect(page.locator("#lesson-zero-shot-section-when-it-fits")).toBeInViewport();
 
   await page.getByRole("link", { name: "Continue to next lesson" }).click();
-  await expect(page).toHaveURL(/lesson=few-shot$/);
-  await expect(page.getByRole("heading", { name: "Few-shot prompting" })).toBeVisible();
+  await expect(page).toHaveURL(/lesson=context$/);
+  await expect(page.getByRole("heading", { name: "Context engineering" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Related lessons" })).toBeVisible();
 });
 
