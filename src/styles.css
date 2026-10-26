@@ -34,3 +34,18 @@
 @media(max-width:750px){.workflow-eval-cases{grid-template-columns:1fr}.workflow-eval-expected{grid-template-columns:1fr}.workflow-eval-toolbar .button{flex:1}.workflow-evaluation-panel{padding:12px}}
 
 .workflow-eval-trace{margin-top:10px;border-top:1px solid #30343d;padding-top:8px}.workflow-eval-trace summary{cursor:pointer;color:#b8c0ce;font-size:10px}.workflow-eval-trace-node{margin-top:8px;padding:9px;border:1px solid #2f333c;border-radius:5px;background:#0c0e12}.workflow-eval-trace-node>div{display:flex;align-items:center;justify-content:space-between;gap:8px}.workflow-eval-trace-node>div strong{font:9px var(--mono);overflow-wrap:anywhere}.workflow-eval-trace-node>p{font-size:9px;color:#a4a9b6}.workflow-eval-trace-node>pre{max-height:120px;overflow:auto;margin:7px 0 0;color:#c6cbd7;white-space:pre-wrap;overflow-wrap:anywhere;font:9px/1.6 var(--mono)}
+
+
+/* Task-first learning discovery */
+.task-finder-intro{margin:8px 0 0;color:#9297a4;font-size:11px;line-height:1.7;max-width:700px}
+.task-finder-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+.task-finder-card{display:flex;flex-direction:column;align-items:flex-start;min-width:0;min-height:220px;padding:15px;border:1px solid var(--line);border-radius:9px;color:var(--text);background:var(--panel);text-align:left;transition:border-color .15s,transform .15s}
+.task-finder-card:hover{border-color:#718457;transform:translateY(-2px)}
+.task-finder-card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.task-finder-number{margin-bottom:12px;color:var(--accent);font:10px var(--mono)}
+.task-finder-card>strong{font-size:12px;line-height:1.5}
+.task-finder-card>p{margin:8px 0 11px;color:#9297a4;font-size:10px;line-height:1.7}
+.task-finder-recommendation{padding:9px 0;border-top:1px solid var(--line);color:#c3c9b8;font-size:10px;line-height:1.7}
+.task-finder-link{margin-top:auto;padding-top:12px;color:var(--accent);font-size:9px;font-weight:700;line-height:1.6}
+@media(max-width:1150px){.task-finder-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:590px){.task-finder-grid{grid-template-columns:1fr}.task-finder-card{min-height:0}.task-finder-recommendation{max-width:100%}}
