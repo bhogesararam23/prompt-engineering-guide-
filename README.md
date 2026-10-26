@@ -8,6 +8,7 @@ A learning-first guide to prompt engineering: understand prompting techniques, l
 
 - Eight source-linked learning modules with examples and deterministic knowledge checks whose attempts are saved locally.
 - A curated task finder on the homepage that routes common jobs—classification, extraction, revision, safe document use, and more—to relevant lessons with a short rationale.
+- Three progress-aware learning routes (Beginner, Everyday Work, Advanced/Technical) that resume at the first incomplete lesson using browser-local completion state.
 - An Advanced Techniques Library with 12 sourced technique cards and practical examples.
 - Lesson completion, bookmarks, and local learning-progress overview.
 - A browser-local prompt library, structured Prompt Lab, reusable templates, and prompt-version comparisons for optional practice.
