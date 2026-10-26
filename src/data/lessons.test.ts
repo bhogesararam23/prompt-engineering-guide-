@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { lessons } from "./lessons";
+import { lessonSectionId } from "../lib/lesson-navigation";
 
 describe("foundational lesson catalogue", () => {
   it("has unique stable IDs and readable, actionable content", () => {
@@ -39,6 +40,14 @@ describe("foundational lesson catalogue", () => {
     for (const [index, lesson] of lessons.entries()) {
       if (index < lessons.length - 1) expect(lesson.nextLessonId).toBe(lessons[index + 1].id);
       else expect(lesson.nextLessonId).toBeUndefined();
+    }
+  });
+
+  it("generates unique, non-empty section anchors for each lesson", () => {
+    for (const lesson of lessons) {
+      const anchors = lesson.sections.map((section) => lessonSectionId(lesson.id, section.heading));
+      expect(anchors.every((anchor) => /^lesson-[a-z0-9-]+-section-[a-z0-9-]+$/.test(anchor))).toBe(true);
+      expect(new Set(anchors).size).toBe(anchors.length);
     }
   });
 
