@@ -8,6 +8,8 @@ A learning-first guide to prompt engineering: understand prompting techniques, l
 
 - Eight source-linked learning modules with stated outcomes, prerequisites, per-lesson contents, related lessons, and an explicit next step.
 - Shareable lesson URLs with browser back/forward support; section links land directly on the relevant lesson heading.
+- A curated task finder maps common jobs-to-be-done to relevant lessons with recommendations and rationale.
+- Three progress-aware learning routes (Beginner, Everyday Work, Advanced/Technical) resume at the first incomplete lesson using browser-local progress.
 - Deterministic knowledge checks whose attempts and completion progress are saved locally.
 - An Advanced Techniques Library with 12 sourced technique cards and practical examples.
 - Lesson completion, bookmarks, and local learning-progress overview.
