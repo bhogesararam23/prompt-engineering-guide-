@@ -20,7 +20,7 @@ function interceptLessonLink(event: MouseEvent<HTMLAnchorElement>, lessonId: str
 export default function LessonLearningScaffold({ lesson, lessons, completedLessonIds, onNavigate, onOpenOverview, position }: Props) {
   const getLesson = (id: string) => lessons.find((item) => item.id === id);
   const prerequisites = lesson.prerequisiteIds.map(getLesson).filter((item): item is Lesson => Boolean(item));
-  const related = lesson.relatedLessonIds.map(getLesson).filter((item): item is Lesson => Boolean(item) && item.id !== lesson.id);
+  const related = lesson.relatedLessonIds.map(getLesson).filter((item): item is Lesson => item !== undefined && item.id !== lesson.id);
   const next = lesson.nextLessonId ? getLesson(lesson.nextLessonId) : undefined;
   const previous = lessons.find((item) => item.nextLessonId === lesson.id);
 
