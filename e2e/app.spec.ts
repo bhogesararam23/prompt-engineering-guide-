@@ -34,6 +34,7 @@ test("learning paths resume at the first incomplete lesson and show saved progre
 });
 
 
+
 test("guide search filters content locally", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /Learning guide/ }).click();
@@ -41,6 +42,34 @@ test("guide search filters content locally", async ({ page }) => {
   await page.getByLabel("FIND A LESSON").fill("prompt injection");
   await expect(page.getByRole("button", { name: /Prompt injection and trust boundaries/ })).toBeVisible();
   await expect(page.getByRole("button", { name: /Zero-shot prompting/ })).toHaveCount(0);
+});
+
+test("lesson routes expose learning objectives, prerequisites, contents, and next steps", async ({ page }) => {
+  await page.goto("/?lesson=zero-shot#lesson-zero-shot-section-when-it-fits");
+  await expect(page).toHaveURL(/lesson=zero-shot#lesson-zero-shot-section-when-it-fits$/);
+  await expect(page.getByRole("heading", { name: "Zero-shot prompting" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "What you will learn" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Recommended prerequisites" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Anatomy of a useful prompt" }).first()).toBeVisible();
+
+  const tableOfContents = page.getByRole("navigation", { name: "On this page" });
+  await expect(page.locator("#lesson-zero-shot-section-when-it-fits")).toBeInViewport();
+  await expect(tableOfContents.getByRole("link", { name: "Measure before adding complexity" })).toBeVisible();
+  await tableOfContents.getByRole("link", { name: "Measure before adding complexity" }).click();
+  await expect(page).toHaveURL(/lesson=zero-shot#lesson-zero-shot-section-measure-before-adding-complexity$/);
+  await expect(page.locator("#lesson-zero-shot-section-measure-before-adding-complexity")).toBeInViewport();
+
+  await page.getByRole("link", { name: "Continue to next lesson" }).click();
+  await expect(page).toHaveURL(/lesson=context$/);
+  await expect(page.getByRole("heading", { name: "Context engineering" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Related lessons" })).toBeVisible();
+
+  await page.goBack();
+  await expect(page).toHaveURL(/lesson=zero-shot#lesson-zero-shot-section-measure-before-adding-complexity$/);
+  await expect(page.getByRole("heading", { name: "Zero-shot prompting" })).toBeVisible();
+  await page.goForward();
+  await expect(page).toHaveURL(/lesson=context$/);
+  await expect(page.getByRole("heading", { name: "Context engineering" })).toBeVisible();
 });
 
 test("Prompt Lab saves two snapshots and compares them", async ({ page }) => {
