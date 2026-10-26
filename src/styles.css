@@ -121,3 +121,10 @@
 .learning-path-card .button{width:100%;margin-top:auto;justify-content:center}
 .learning-path-card>small{margin-top:9px;color:#858a98;font-size:9px}
 @media(max-width:900px){.learning-path-grid{grid-template-columns:1fr}}
+
+
+/* Keyboard access and landmark navigation */
+.skip-link{position:fixed;z-index:2000;top:10px;left:10px;transform:translateY(calc(-100% - 14px));padding:11px 15px;border:2px solid var(--accent);border-radius:6px;color:#10120c;background:var(--accent);font-size:12px;font-weight:800;text-decoration:none;box-shadow:0 6px 24px #0008}
+.skip-link:focus{transform:translateY(0);outline:3px solid #fff;outline-offset:3px}
+.main-content:focus{outline:none}
+.nav-item:focus-visible,.button:focus-visible,.text-button:focus-visible,.disclosure-button:focus-visible,.category-list button:focus-visible,.lesson-list-item:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
