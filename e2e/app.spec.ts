@@ -148,3 +148,20 @@ test("workflow evaluation scores the starter graph against the same local datase
   await page.getByRole("button", { name: "Save dataset" }).click();
   await expect(page.getByRole("status")).toContainText("dataset saved locally");
 });
+
+
+test("keyboard users can skip repeated navigation and identify the current section", async ({ page }) => {
+  await page.goto("/");
+  const skipLink = page.getByRole("link", { name: "Skip to main content" });
+  await expect(skipLink).toBeAttached();
+  await page.keyboard.press("Tab");
+  await expect(skipLink).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#main-content")).toBeFocused();
+
+  const overview = page.getByRole("button", { name: /Overview/ });
+  await expect(overview).toHaveAttribute("aria-current", "page");
+  await page.getByRole("button", { name: /Learning guide/ }).click();
+  await expect(page.getByRole("button", { name: /Learning guide/ })).toHaveAttribute("aria-current", "page");
+  await expect(page.getByRole("button", { name: /Overview/ })).not.toHaveAttribute("aria-current", "page");
+});
