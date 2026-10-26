@@ -161,6 +161,16 @@ Proposed content order:
 
 Avoid a hero dominated by a prompt generator, a fake conversation interface, unsupported performance percentages, or a large grid of shallow prompt cards.
 
+### Implementation status — 26 October 2026
+
+- [x] Homepage task finder: eight curated, deterministic job-to-lesson routes with a brief recommendation and rationale; no chatbot or model call is required.
+- [x] Automated checks verify task IDs, lesson references, distinct coverage, and browser navigation from a task card into its lesson.
+- [ ] Add coherent Beginner, Everyday Work, and Advanced/Technical learning paths with prerequisites and progression criteria.
+- [ ] Add reviewed task-specific worked cases with weak/better prompt comparisons and explicit assessment rubrics.
+- [ ] Add maintained AI product guides with first-party sources and last-reviewed metadata.
+
+The task finder is a navigation layer over the current eight lessons, not a claim that the full task library or role-based curriculum is complete.
+
 ### Standard lesson page
 
 Every lesson should use a consistent structure:
