@@ -63,15 +63,15 @@ export const exercises: LessonExercise[] = [
   {
     id: "check-decomposition",
     lessonId: "decomposition",
-    question: "What is a key risk of multi-step prompt chains?",
+    question: "Which change makes a prompt improvement experiment easier to interpret?",
     choices: [
-      "They cannot accept text as input.",
-      "They always use fewer tokens than a single prompt.",
-      "An early mistake can propagate into later stages.",
-      "They make intermediate outputs impossible to inspect."
+      "Rewrite every part of the prompt and replace the test set at the same time.",
+      "Change one relevant prompt component and keep representative test cases fixed.",
+      "Keep only the best-looking output and discard failures.",
+      "Add examples even when the failure is unrelated to missing examples."
     ],
-    correctIndex: 2,
-    explanation: "Chains can improve control but add complexity and can amplify early mistakes, so intermediate outputs should be validated."
+    correctIndex: 1,
+    explanation: "A specific diagnosis, one justified change, and a fixed comparison set make the effect of a revision easier to interpret."
   },
   {
     id: "check-evaluation",
