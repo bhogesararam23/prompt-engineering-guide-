@@ -10,9 +10,9 @@ describe("lesson navigation helpers", () => {
   });
 
   it("creates a stable link for each lesson", () => {
-    expect(lessonHref("anatomy")).toBe("/?lesson=anatomy");
-    expect(lessonHref("structured-output")).toBe("/?lesson=structured-output");
-    expect(lessonHref("lesson with spaces")).toBe("/?lesson=lesson%20with%20spaces");
+    expect(lessonHref("anatomy")).toBe("?lesson=anatomy");
+    expect(lessonHref("structured-output")).toBe("?lesson=structured-output");
+    expect(lessonHref("lesson with spaces")).toBe("?lesson=lesson%20with%20spaces");
   });
 
   it("creates readable section anchors and normalizes punctuation", () => {
