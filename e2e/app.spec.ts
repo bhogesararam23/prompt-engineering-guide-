@@ -26,7 +26,7 @@ test("learning paths resume at the first incomplete lesson and show saved progre
   await beginner.getByRole("button", { name: /Continue/ }).click();
   await expect(page.getByRole("heading", { name: "Anatomy of a useful prompt" })).toBeVisible();
   await page.getByRole("button", { name: "Mark lesson complete" }).click();
-  await page.getByRole("button", { name: "Overview" }).click();
+  await page.getByRole("button", { name: "Overview", exact: true }).click();
   await expect(page.locator(".learning-path-card").filter({ hasText: "Beginner foundations" })).toContainText("1/4 lessons");
   await expect(page.locator(".learning-path-card").filter({ hasText: "Beginner foundations" })).toContainText("25% complete");
   await page.locator(".learning-path-card").filter({ hasText: "Beginner foundations" }).getByRole("button", { name: /Continue · Zero-shot prompting/ }).click();
