@@ -18,6 +18,21 @@ test("homepage task finder opens the relevant lesson", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Zero-shot prompting" })).toBeVisible();
 });
 
+test("learning paths resume at the first incomplete lesson and show saved progress", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Choose your learning path" })).toBeVisible();
+  const beginner = page.locator(".learning-path-card").filter({ hasText: "Beginner foundations" });
+  await expect(beginner).toContainText("0/4 lessons");
+  await beginner.getByRole("button", { name: /Continue/ }).click();
+  await expect(page.getByRole("heading", { name: "Anatomy of a useful prompt" })).toBeVisible();
+  await page.getByRole("button", { name: "Mark lesson complete" }).click();
+  await page.getByRole("button", { name: "Overview" }).click();
+  await expect(page.locator(".learning-path-card").filter({ hasText: "Beginner foundations" })).toContainText("1/4 lessons");
+  await expect(page.locator(".learning-path-card").filter({ hasText: "Beginner foundations" })).toContainText("25% complete");
+  await page.locator(".learning-path-card").filter({ hasText: "Beginner foundations" }).getByRole("button", { name: /Continue · Zero-shot prompting/ }).click();
+  await expect(page.getByRole("heading", { name: "Zero-shot prompting" })).toBeVisible();
+});
+
 
 test("guide search filters content locally", async ({ page }) => {
   await page.goto("/");
