@@ -165,7 +165,7 @@ Avoid a hero dominated by a prompt generator, a fake conversation interface, uns
 
 - [x] Homepage task finder: eight curated, deterministic job-to-lesson routes with a brief recommendation and rationale; no chatbot or model call is required.
 - [x] Automated checks verify task IDs, lesson references, distinct coverage, and browser navigation from a task card into its lesson.
-- [ ] Add coherent Beginner, Everyday Work, and Advanced/Technical learning paths with prerequisites and progression criteria.
+- [x] Add initial Beginner, Everyday Work, and Advanced/Technical learning routes with ordered lessons and browser-local progress/resume. (Prerequisite metadata and mastery-based progression remain open.)
 - [ ] Add reviewed task-specific worked cases with weak/better prompt comparisons and explicit assessment rubrics.
 - [ ] Add maintained AI product guides with first-party sources and last-reviewed metadata.
 
