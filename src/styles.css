@@ -49,3 +49,19 @@
 .task-finder-link{margin-top:auto;padding-top:12px;color:var(--accent);font-size:9px;font-weight:700;line-height:1.6}
 @media(max-width:1150px){.task-finder-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:590px){.task-finder-grid{grid-template-columns:1fr}.task-finder-card{min-height:0}.task-finder-recommendation{max-width:100%}}
+
+
+/* Curated learning routes */
+.learning-path-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.learning-path-card{display:flex;flex-direction:column;align-items:flex-start;min-width:0;padding:17px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.learning-path-top{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%}
+.learning-path-level{padding:4px 7px;border:1px solid #3b4530;border-radius:4px;color:var(--accent);font:9px var(--mono)}
+.learning-path-progress{color:#858a98;font:9px var(--mono)}
+.learning-path-card h3{margin:16px 0 5px;font-size:14px;line-height:1.5}
+.learning-path-card>p{margin:7px 0;color:#9297a4;font-size:10px;line-height:1.75}
+.learning-path-card .learning-path-audience{margin:0;color:#c4c9b9;font-size:10px}
+.learning-path-track{width:100%;height:5px;overflow:hidden;margin:14px 0;border-radius:99px;background:#30343d}
+.learning-path-track span{display:block;height:100%;border-radius:99px;background:var(--accent);transition:width .15s}
+.learning-path-card .button{width:100%;margin-top:auto;justify-content:center}
+.learning-path-card>small{margin-top:9px;color:#858a98;font-size:9px}
+@media(max-width:900px){.learning-path-grid{grid-template-columns:1fr}}
