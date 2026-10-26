@@ -72,6 +72,11 @@ export default function App() {
  const evaluationSummary = useMemo(() => summarizeEvaluation(evaluationCases, { promptTitle: draft.title || "Current Prompt Lab draft", modelId: DEFAULT_MODEL_ID }), [evaluationCases, draft.title]);
  const filtered = lessons.filter((item) => (category === "All" || (category === "Bookmarked" ? learningState.bookmarkedLessonIds.includes(item.id) : category === item.category)) && (item.title + " " + item.summary + " " + item.category).toLowerCase().includes(search.trim().toLowerCase()));
  const lesson = lessons.find((item) => item.id === lessonId) || lessons[0];
+ useEffect(() => {
+  if (view !== "guide" || typeof window === "undefined" || !window.location.hash) return;
+  const targetId = window.location.hash.slice(1);
+  document.getElementById(targetId)?.scrollIntoView({ behavior: "auto", block: "start" });
+ }, [view, lessonId]);
  const openLesson = (id: string) => {
   if (!lessons.some((item) => item.id === id)) return;
   setLessonId(id);
