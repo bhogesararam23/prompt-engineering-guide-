@@ -214,9 +214,10 @@ test("keyboard users can skip repeated navigation and identify the current secti
   await page.keyboard.press("Enter");
   await expect(page.locator("#main-content")).toBeFocused();
 
-  const overview = page.getByRole("button", { name: /Overview/ });
+  const mainNavigation = page.getByRole("navigation", { name: "Main navigation" });
+  const overview = mainNavigation.getByRole("button", { name: /Overview/ });
   await expect(overview).toHaveAttribute("aria-current", "page");
-  await page.getByRole("button", { name: /Learning guide/ }).click();
-  await expect(page.getByRole("button", { name: /Learning guide/ })).toHaveAttribute("aria-current", "page");
-  await expect(page.getByRole("button", { name: /Overview/ })).not.toHaveAttribute("aria-current", "page");
+  await mainNavigation.getByRole("button", { name: /Learning guide/ }).click();
+  await expect(mainNavigation.getByRole("button", { name: /Learning guide/ })).toHaveAttribute("aria-current", "page");
+  await expect(overview).not.toHaveAttribute("aria-current", "page");
 });
