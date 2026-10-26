@@ -8,6 +8,17 @@ test("overview loads without any model initialized", async ({ page }) => {
   await expect(page.getByRole("button", { name: /Load local model/ })).toHaveCount(0);
 });
 
+test("homepage task finder opens the relevant lesson", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "What are you trying to do?" })).toBeVisible();
+  const task = page.getByRole("button", { name: /Classify or label text/ });
+  await expect(task).toContainText("Zero-shot prompting");
+  await task.click();
+  await expect(page.getByRole("heading", { name: "Learning guide" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Zero-shot prompting" })).toBeVisible();
+});
+
+
 test("guide search filters content locally", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /Learning guide/ }).click();
