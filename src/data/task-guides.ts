@@ -13,6 +13,10 @@ export type TaskGuide = {
   weakPrompt: string;
   improvedPrompt: string;
   changes: string[];
+  /** Recurring mistakes this scenario is meant to prevent. */
+  mistakes: string[];
+  /** A short exercise that practises the improved version. */
+  practice: string;
 };
 
 /**
@@ -35,7 +39,12 @@ export const taskGuides: TaskGuide[] = [
       "States the reader, which changes word choice and what needs explaining.",
       "Adds two required elements instead of hoping they appear.",
       "Adds an exclusion, so the draft cannot invent an offer."
-    ]
+    ],
+    mistakes: [
+      "Asking to 'write something' without naming format, reader, or length, then blaming the model when the draft misses.",
+      "Stacking several unrelated requests in one message so none of them can be checked."
+    ],
+    practice: "Take a request you sent this week and rewrite it with four parts: the task, the reader, one must-include element, and one exclusion. Put both versions side by side and mark what became checkable."
   },
   {
     id: "classify-text",
@@ -51,7 +60,12 @@ export const taskGuides: TaskGuide[] = [
       "Fixes the label set, so two runs can be compared.",
       "Defines the output as a single token, which is easy to check in code.",
       "Adds an OTHER case for input that does not fit, instead of forcing a wrong label."
-    ]
+    ],
+    mistakes: [
+      "Letting the model invent its own labels, so two runs of the same input disagree.",
+      "Forcing every input into a label set that has no fallback for items that do not fit."
+    ],
+    practice: "Write down ten real items from your inbox or feedback queue and label them yourself first. Run the same prompt on them and count where your labels and the output disagree, then adjust the label definitions."
   },
   {
     id: "match-a-style",
@@ -67,7 +81,12 @@ export const taskGuides: TaskGuide[] = [
       "Supplies examples, which carry voice more reliably than describing voice.",
       "States the rules the examples share, so new lines do not drift.",
       "Constrains length and banned words to things you can actually check."
-    ]
+    ],
+    mistakes: [
+      "Describing a brand voice with abstract adjectives like 'premium' or 'modern' and nothing to copy.",
+      "Choosing examples that are all near-identical, so the model never sees the range you want."
+    ],
+    practice: "Collect three examples of writing you admire, write down one rule they all share, and build a prompt that uses the examples plus the rule. Test it on a fresh topic and see whether the output still follows the pattern."
   },
   {
     id: "extract-structured",
@@ -84,7 +103,12 @@ export const taskGuides: TaskGuide[] = [
       "Defines missing-value behaviour instead of leaving it to chance.",
       "Explicitly forbids guessing and extra keys, which are common failure modes.",
       "Delimits the source text so instructions and data stay separate."
-    ]
+    ],
+    mistakes: [
+      "Asking to 'pull out the important details' without naming the fields you need.",
+      "Accepting generated JSON without validating it, so a wrong value flows into the next step."
+    ],
+    practice: "Define a five-field schema for a real document you handle, including how a missing value should appear. Extract it once, then check every field against the source and note each mismatch."
   },
   {
     id: "improve-a-result",
@@ -100,7 +124,12 @@ export const taskGuides: TaskGuide[] = [
       "States the success criteria first, so failures can be named precisely.",
       "Supplies evidence rather than a vague impression of badness.",
       "Asks for one targeted change, which keeps the next comparison interpretable."
-    ]
+    ],
+    mistakes: [
+      "Rewriting the whole prompt at once, so you can never tell which change helped.",
+      "Judging an improvement from a single output you happen to like."
+    ],
+    practice: "Save your current prompt and three representative outputs. Write one sentence naming what specifically failed, make one change, and rerun the same three cases before deciding it is better."
   },
   {
     id: "use-documents-safely",
@@ -117,7 +146,12 @@ export const taskGuides: TaskGuide[] = [
       "States what the model must not do with embedded instructions.",
       "Requires quoted evidence, which makes claims checkable.",
       "Adds an escalation path instead of relying on the model to refuse silently."
-    ]
+    ],
+    mistakes: [
+      "Treating a sentence in the prompt as a security control that stops a malicious document.",
+      "Pasting confidential documents into a tool whose data handling you have not checked."
+    ],
+    practice: "Take a document you would happily share and write the boundary yourself: what counts as data, what the model may do with it, and the exact response you want if the document tries to change the rules."
   },
   {
     id: "break-down-work",
@@ -133,7 +167,12 @@ export const taskGuides: TaskGuide[] = [
       "Splits the work into stages with an approval gate, so errors do not propagate.",
       "Grounds the first step in supplied notes rather than the model's guesses.",
       "Forces uncertainty to surface as explicit questions instead of confident filler."
-    ]
+    ],
+    mistakes: [
+      "Asking for the whole deliverable in one shot and reviewing only the final artifact.",
+      "Trusting step one without checking it, so every later step inherits the same error."
+    ],
+    practice: "Split one real project into three ordered steps, write down the check you would run after each, and mark the earliest step where a mistake would become expensive to fix."
   },
   {
     id: "choose-useful-context",
@@ -150,7 +189,12 @@ export const taskGuides: TaskGuide[] = [
       "Requires a citation per item, which keeps claims traceable.",
       "Asks for conflicts to be shown rather than silently resolved.",
       "Names the gap explicitly, which is the most useful output of the exercise."
-    ]
+    ],
+    mistakes: [
+      "Pasting everything you have and hoping relevance will sort itself out.",
+      "Letting the model resolve contradictions between sources without showing you the conflict."
+    ],
+    practice: "Take a real summarising request and cut the context down to only what the decision needs. Note what you removed, then compare the two outputs for accuracy and for noise."
   },
   {
     id: "study-a-difficult-topic",
@@ -167,7 +211,12 @@ export const taskGuides: TaskGuide[] = [
       "Names the exact gap instead of the whole topic.",
       "Requests a self-test with answers, so you can check yourself honestly.",
       "Excludes advanced material that would derail a first pass."
-    ]
+    ],
+    mistakes: [
+      "Asking for an explanation 'like I'm five', which strips out the vocabulary you actually need.",
+      "Reading a correct explanation once and mistaking recognition for understanding."
+    ],
+    practice: "Pick a topic you studied recently, write two sentences on what you already know and one on where you get stuck, and request a three-question self-test before reading any explanation."
   },
   {
     id: "research-with-sources",
@@ -184,7 +233,12 @@ export const taskGuides: TaskGuide[] = [
       "Adds a NOT IN SOURCES escape hatch so gaps are visible.",
       "Formats citations inline, which makes verification a quick pass.",
       "Separates inference from evidence, so the reader knows what is sourced."
-    ]
+    ],
+    mistakes: [
+      "Asking a general question and treating the model's memory as if it were a source.",
+      "Citing a source you have never opened yourself."
+    ],
+    practice: "Take one claim you got from an AI tool, find the primary source behind it, and record whether the source actually says what was claimed. Do this three times before trusting citations again."
   },
   {
     id: "explain-or-fix-code",
@@ -201,7 +255,12 @@ export const taskGuides: TaskGuide[] = [
       "Includes the error text and the code instead of a description of the problem.",
       "Mentions what was already tried, so the same suggestion is not repeated.",
       "Asks for a minimal patch plus the test that proves it, not a rewrite."
-    ]
+    ],
+    mistakes: [
+      "Describing the bug in prose instead of pasting the error text and the code involved.",
+      "Accepting a large rewrite that changes code you did not ask about."
+    ],
+    practice: "Turn the improved prompt into a reusable bug-report template with expected behaviour, actual behaviour, error text, code, and what you already tried. Use it on your next real problem."
   },
   {
     id: "plan-an-analysis",
@@ -218,7 +277,12 @@ export const taskGuides: TaskGuide[] = [
       "Anchors the fields to the real schema instead of imagined columns.",
       "Requires a test per hypothesis, so each can be run and falsified.",
       "Asks what the data cannot answer, which prevents invented causality."
-    ]
+    ],
+    mistakes: [
+      "Jumping to conclusions before agreeing on what the data actually contains.",
+      "Letting the model reason about columns that are not in the dataset."
+    ],
+    practice: "Take a real business question and request a plan only: the fields, three candidate explanations with the test for each, the assumptions, and what the data cannot answer. Write your own conclusion first, then compare."
   },
   {
     id: "write-a-status-update",
@@ -235,7 +299,12 @@ export const taskGuides: TaskGuide[] = [
       "Forces UNKNOWN instead of a confident guess for missing owners or dates.",
       "Constrains line length, which forces the summary rather than a paste of the notes.",
       "Adds a Missing section, turning a review into a quick diff against the notes."
-    ]
+    ],
+    mistakes: [
+      "Accepting owners and dates that sound right but were never in the notes.",
+      "Letting the update restate every detail instead of selecting what matters."
+    ],
+    practice: "Take notes from your last meeting and write the update yourself first. Then run the prompt and diff the two versions, paying attention to anything it invented or dropped."
   },
   {
     id: "summarize-for-a-reader",
@@ -252,7 +321,12 @@ export const taskGuides: TaskGuide[] = [
       "Gives a length and structure that can be verified by counting.",
       "Restricts figures to the source, blocking invented statistics.",
       "Adds an exclusion so the output is not a copy of something already written."
-    ]
+    ],
+    mistakes: [
+      "Skipping the reader, so the summary defaults to a generic overview of everything.",
+      "Accepting numbers or dates that do not appear in the source document."
+    ],
+    practice: "Summarise the same report for two different readers with the same prompt structure. Compare the bullets that changed; that difference is what choosing an audience does."
   }
 ];
 
@@ -286,6 +360,12 @@ export function validateTaskGuides(): string[] {
     }
     if (task.changes.length < 3 || task.changes.some((change) => change.trim().length < 20)) {
       errors.push("Task " + task.id + " must explain at least three changes of at least 20 characters.");
+    }
+    if (task.mistakes.length < 2 || task.mistakes.some((mistake) => mistake.trim().length < 20)) {
+      errors.push("Task " + task.id + " must list at least two common mistakes.");
+    }
+    if (task.practice.trim().length < 60) {
+      errors.push("Task " + task.id + " must include a practice exercise of at least 60 characters.");
     }
   }
   for (const area of areas) {

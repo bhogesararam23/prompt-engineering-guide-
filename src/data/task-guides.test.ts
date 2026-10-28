@@ -36,6 +36,13 @@ describe("task-first learning finder", () => {
     }
   });
 
+  it("names common mistakes and gives a practice exercise for every scenario", () => {
+    for (const task of taskGuides) {
+      expect(task.mistakes.length).toBeGreaterThanOrEqual(2);
+      expect(task.practice.trim().length).toBeGreaterThanOrEqual(60);
+    }
+  });
+
   it("covers every work area learners ask about", () => {
     expect(taskAreas()).toEqual(["Writing", "Studying", "Research", "Coding", "Data analysis", "Business", "Marketing", "Everyday work"]);
   });
