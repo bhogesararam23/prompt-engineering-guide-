@@ -1,85 +1,106 @@
 # Prompt Engineering Guide
 
-A learning-first guide to prompt engineering: understand prompting techniques, learn how to improve and evaluate prompts, and apply the right patterns to real tasks. The long-term direction is a professional, source-linked learning publication with task-focused lessons and maintained guides for major AI products.
+**Learn to get better results from AI—across tasks, professions, and models.**
 
-**No hosted LLM API is configured. No model API key is required.** The guide, Prompt Lab, validation tools, and browser library work without loading a model.
+Prompt Engineering Guide is a learning-first website for people who want to use AI more effectively. It teaches prompting in plain language, from the fundamentals to advanced practice, and explains what changes between AI products instead of pretending one formula works everywhere.
+
+The goal is to become a trusted place to **learn prompting, practise it, and choose the right approach for the AI tool and task at hand**. It is a learning platform—not a chatbot, prompt marketplace, or directory of shallow prompt templates.
+
+## What learners should be able to do
+
+- Turn a vague request into a clear, useful prompt.
+- Add context, examples, constraints, and output formats when they help.
+- Diagnose weak or incorrect results and improve the prompt systematically.
+- Verify important claims and recognize when prompting cannot solve the underlying problem.
+- Apply prompting to everyday work, study, writing, research, analysis, coding, and other professional tasks.
+- Understand which principles transfer across models and which advice is product-specific.
+- Use AI more safely, including protecting private or confidential information.
+
+## Learning across AI products
+
+The long-term curriculum will cover major AI assistants, model families, and relevant tools across regions and ecosystems—not only US providers. Planned coverage includes:
+
+- **OpenAI:** ChatGPT and relevant API/model guidance.
+- **Anthropic:** Claude.
+- **Google:** Gemini.
+- **Microsoft:** Copilot.
+- **Search and research:** Perplexity and other relevant research tools.
+- **Chinese AI ecosystems:** for example DeepSeek, Qwen/Alibaba, Kimi/Moonshot, GLM/Zhipu, MiniMax, ERNIE/Baidu, and Tencent Hunyuan.
+- **Other model families and platforms:** for example Mistral, Meta Llama, xAI Grok, Amazon Nova, open-weight/local models, and relevant coding, image, audio, and video tools.
+
+This is a **coverage direction, not a claim that every guide is already published**. Product-specific advice must be supported by current first-party documentation where possible, carry a last-verified date, and clearly state version, plan, or regional caveats. Guides will be prioritised by learner value and maintainability rather than by the number of logos or pages.
 
 ## Current learning experience
 
-- Eight source-linked learning modules with stated outcomes, prerequisites, per-lesson contents, related lessons, and an explicit next step.
-- A curated task finder on the homepage that routes common jobs—classification, extraction, revision, safe document use, and more—to relevant lessons with a short rationale.
-- Three progress-aware learning routes (Beginner, Everyday Work, Advanced/Technical) that resume at the first incomplete lesson using browser-local completion state.
-- Shareable lesson URLs with browser back/forward support; section links land directly on the relevant lesson heading.
-- Deterministic knowledge checks whose attempts and completion progress are saved locally.
-- An Advanced Techniques Library with 12 sourced technique cards and practical examples.
-- Lesson completion, bookmarks, and local learning-progress overview.
-- A browser-local prompt library, structured Prompt Lab, reusable templates, and prompt-version comparisons for optional practice.
-- The learning pages work without loading a model, entering an API key, or connecting to a hosted LLM service.
+- Eight source-linked learning modules with outcomes, prerequisites, related lessons, and next steps.
+- A curated task finder that routes common jobs to relevant lessons.
+- Beginner, Everyday Work, and Advanced/Technical learning routes.
+- Shareable lesson URLs, section navigation, and browser-local completion progress.
+- Deterministic knowledge checks, bookmarks, and a local learning-progress overview.
+- A technique library with sourced technique cards and practical examples.
+- A browser-local Prompt Lab, reusable templates, a prompt library, and prompt-version comparisons.
+- Optional advanced workflow-building, evaluation, and local-model experiments.
 
-## Supporting practice and engineering features
+**Important:** The current experience is an evolving foundation. The full task library, role-based curriculum, and maintained cross-provider guides are planned work—not features we claim are complete. See the [learning-platform roadmap](docs/LEARNING_PLATFORM_ROADMAP.md).
 
-- An optional Graph & Loop Builder with graph validation, import/export, undo/redo, bounded loops, and human-review steps.
-- A local workflow Evaluation Bench with editable datasets, per-case traces, deterministic match rules, cancellation, and local run history.
-- Optional WebLLM inference in a browser worker; model assets may require substantial first-time downloads and compatible WebGPU hardware.
-- An optional FastAPI/SQLite backend for explicitly managed prompt storage. It does not proxy a hosted LLM.
-- CI checks for the local-first policy, TypeScript, unit tests, production build, Playwright journeys, and backend tests.
+## Product principles
 
-**Product direction:** the main goal is to become a professional learning site for prompt engineering. The task library, role-based paths, richer technique curriculum, and maintained company/product guides are planned—not claimed as complete. See the [learning-platform roadmap](docs/LEARNING_PLATFORM_ROADMAP.md).
+1. **Beginner-friendly by default.** Teach the idea before introducing jargon or code.
+2. **Task before technique.** Start with what the learner is trying to do, then explain a suitable approach.
+3. **Transferable foundations first.** Teach general principles before provider-specific exceptions.
+4. **Evidence over hype.** Link sources, date changing claims, and separate documented facts from editorial advice.
+5. **Learn by doing.** Use weak/better examples, practice, and clear rubrics—not just long articles.
+6. **Honest evaluation.** Deterministic checks are not presented as model judgments; examples do not prove universal performance gains.
+7. **Quality before page count.** No mass-generated, near-duplicate pages made only to attract search traffic.
+8. **Local-first where practical.** Reading and core practice should not require an account, API key, or hosted model call.
+9. **Trust and safety.** Explain limitations, source quality, privacy, and the need for human review.
 
-## Frontend setup
+## Development setup
 
 Requirements: Node.js 22.12.0 or newer, or Node.js 20.19.x, plus npm.
 
-~~~sh
+```sh
 npm install
 npm run dev
-~~~
+```
 
 Open the local URL printed by Vite, normally http://localhost:5173.
 
-~~~sh
+Run the main quality gates before proposing a change:
+
+```sh
 npm run check:local-first
 npm run typecheck
 npm test
 npm run build
 npx playwright install chromium
 npm run test:e2e
-npm run preview
-~~~
+```
 
 ## Optional local model
 
-Open Local playground and choose Load local model. The first load can download runtime assets and model weights, so it may consume substantial bandwidth, storage, and memory. A supported browser with WebGPU and sufficient device resources is required.
-
-Inference is run by the browser runtime. The application does not send prompts to a hosted LLM endpoint. The first-time acquisition of runtime files or weights may still use the network; fully offline operation must be tested after all required assets are cached. Model quality and performance vary by device and model.
+The local playground can use WebLLM in a browser worker. Loading a model may download substantial runtime assets and model weights and requires compatible WebGPU support and sufficient device resources. Model quality and performance vary. The learning site must remain useful when local inference is unavailable.
 
 ## Optional API
 
-The API stores prompts in a local SQLite database and provides health and deterministic validation endpoints. It does not proxy or call an LLM. Read docs/BACKEND.md for setup. By default, Uvicorn should bind to localhost. The API supports optional bearer-token protection using `PROMPT_GUIDE_API_TOKEN`; configure the matching token in the API panel for the current session. This is single-user protection, not multi-tenant authentication. Keep the API on localhost unless you add full production security and deployment controls.
+The FastAPI/SQLite service supports explicitly managed prompt storage and deterministic validation; it does not proxy a hosted LLM. See [backend documentation](docs/BACKEND.md). The current API is not a production multi-user service: keep it on localhost unless proper authentication, deployment security, and a threat-model review are completed.
 
 ## Documentation
 
-- docs/ARCHITECTURE.md — application boundaries and data flow.
-- docs/BACKEND.md — backend setup and endpoint reference.
-- docs/ROADMAP.md — current product-roadmap entry point.
-- docs/LEARNING_PLATFORM_ROADMAP.md — detailed learning-first strategy, competitor benchmark, curriculum, company-specific guides, content standards, UX, SEO, monetization, metrics, and phased exit gates.
-- docs/ENGINEERING_ROADMAP.md — supporting technical milestones for the existing implementation; this does not supersede the learning-first product strategy.
-- docs/ADVANCED_PROMPTING_SPEC.md — source-linked specification for advanced techniques, loop behavior, workflow graph semantics, safety, and release criteria.
-- SECURITY.md — data handling and security expectations.
-- CONTRIBUTING.md — development and contribution workflow.
-
-## Principles
-
-1. Useful without a model: learning, editing, validation, and browser persistence do not depend on inference.
-2. Local-first by default: saved browser prompts remain in the current browser profile unless exported.
-3. Honest boundaries: deterministic checks are not presented as model judgments.
-4. No secrets in client code: never commit keys or put secrets in frontend environment variables.
-5. Quality gates before claims: a feature is not marked complete until the relevant check actually passes.
+- [Learning Platform Roadmap](docs/LEARNING_PLATFORM_ROADMAP.md) — product strategy, audience, curriculum, provider guides, content standards, discovery, metrics, and phased exit gates.
+- [Roadmap](docs/ROADMAP.md) — current priorities and next implementation steps.
+- [Architecture](docs/ARCHITECTURE.md) — application boundaries and data flow.
+- [Backend](docs/BACKEND.md) — optional API setup and behavior.
+- [Engineering Roadmap](docs/ENGINEERING_ROADMAP.md) — supporting technical milestones.
+- [Advanced Prompting Specification](docs/ADVANCED_PROMPTING_SPEC.md) — advanced techniques and workflow semantics.
+- [Release Checklist](docs/RELEASE_CHECKLIST.md) — release-readiness gates.
+- [Security](SECURITY.md) — data handling and security expectations.
+- [Contributing](CONTRIBUTING.md) — development and contribution workflow.
 
 ## Licensing and release readiness
 
-No project license has been selected in this rebuild branch. Until a LICENSE file is added by the maintainer, do not assume that public visibility grants permission to redistribute or reuse the code. See [the release checklist](docs/RELEASE_CHECKLIST.md) for the remaining security, test, and deployment gates.
+No project license has been selected in this rebuild. Until a `LICENSE` file is added by the maintainer, do not assume public visibility grants permission to redistribute or reuse the code. The release checklist tracks outstanding launch, security, and quality gates.
 
-## Current scope
+## Current scope boundaries
 
-The frontend and API are separate capabilities. Prompt transfer is explicit and manually initiated; automatic/background sync, accounts, content administration, richer evaluation metrics, and fully offline model packaging remain future milestones.
+The frontend and optional API are separate capabilities. Browser-saved prompts and API-saved prompts are not automatically synchronised. Accounts, multi-user administration, automatic cloud sync, a content management system, and a fully maintained guide for every AI product are not currently complete. Add these only when a validated requirement and an appropriate privacy/security plan justify them.
