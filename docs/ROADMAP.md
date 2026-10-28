@@ -14,8 +14,9 @@ The older implementation-focused roadmap has been preserved as the [Engineering 
 2. **Improve information architecture and presentation** — put Learn, Techniques, By Task, By Role, and AI Product Guides at the center when the relevant sections have enough content to be useful. Keep Prompt Lab and workflow features as optional Practice tools.
 3. **Finish the foundational curriculum** — create a coherent eight-module learning path with worked examples, failure diagnosis, practice, rubrics, and honest limitations.
 4. **Establish content operations** — standard lesson metadata, primary-source citations, review dates, correction process, page ownership, and criteria for publication.
-5. **Expand based on evidence** — build the technique encyclopedia, task library, and first-party-sourced product guides using learner research and the editorial gates in the detailed roadmap.
-6. **Harden before growth or monetization** — test accessibility, crawlability, mobile reading, quality, privacy, licensing, and production reliability. Treat advertising as a later experiment, not the reason to publish shallow content.
+5. **Build the cross-provider content system** — establish one reusable, source-linked guide format; publish the initial general-assistant guides; then expand to Chinese AI ecosystems (DeepSeek, Qwen, Kimi, GLM, MiniMax, ERNIE, Tencent Hunyuan) and other relevant model families such as Mistral, Llama, Grok, and Nova. Publish only when each guide meets the same quality bar.
+6. **Grow through useful, discoverable learning pages** — build task-first pages around real learner questions, clear titles, internal links, structured metadata, worked examples, and trustworthy sources. Do not mass-publish near-duplicates or promise that content guarantees search/LLM recommendations.
+7. **Harden before growth or monetization** — test accessibility, crawlability, mobile reading, content quality, privacy, licensing, and production reliability. Treat advertising as a later experiment, not the reason to publish shallow content.
 
 ## Phase 1 implementation checkpoint
 
