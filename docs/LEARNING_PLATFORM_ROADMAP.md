@@ -474,12 +474,32 @@ Start with a small number of deeply worked scenarios, then expand using learner 
 
 These guides are a major planned differentiator, but they are also the content most likely to become stale. Maintain fewer accurate guides rather than a wide set of abandoned pages.
 
-### Tier 1 — First-party consumer assistants
+### Tier 1 — Core general-purpose assistants
 1. **ChatGPT / OpenAI**
 2. **Claude / Anthropic**
 3. **Gemini / Google**
 4. **Microsoft Copilot**
 5. **Perplexity**
+
+These are the initial priority because they establish the guide template and cover common learner needs. They are not the intended limit of provider coverage.
+
+### Tier 2 — Chinese AI ecosystems and other major model families
+Expand deliberately to include relevant products and model families such as:
+- **DeepSeek**
+- **Qwen / Alibaba**
+- **Kimi / Moonshot AI**
+- **GLM / Zhipu AI**
+- **MiniMax**
+- **ERNIE / Baidu**
+- **Tencent Hunyuan**
+- **Mistral**
+- **Meta Llama** and relevant local/open-weight runtimes
+- **xAI Grok** and **Amazon Nova**, where there is sufficient learner demand and reliable documentation
+
+Do not publish a thin page merely to claim coverage. Start with high-value guides and expand as each can meet the same sourcing, example, review, and maintenance bar. The taxonomy must distinguish a **company**, a **product**, a **model family**, and a **hosting/tool platform**; they are related but not interchangeable.
+
+### Tier 3 — Coding, visual, and other specialist tools
+After the core assistant and model-family guides are useful and maintained, add selected coding assistants and visual/multimodal products (image, video, audio, and design). Prioritise them by real learner tasks, not brand count.
 
 Each guide should cover, when applicable and officially documented:
 - What this product is suited for and what it is not.
