@@ -12,6 +12,7 @@ describe("route parsing and link building", () => {
     expect(parseRoute("?view=roles&role=developer")).toMatchObject({ view: "roles", roleId: "developer" });
     expect(parseRoute("?view=products&guide=claude")).toMatchObject({ view: "products", guideId: "claude" });
     expect(parseRoute("?view=search&q=context")).toMatchObject({ view: "search", query: "context" });
+    expect(parseRoute("?view=tasks&task=classify-text")).toMatchObject({ view: "tasks", taskId: "classify-text" });
   });
 
   it("falls back to the overview for unknown or empty queries", () => {
@@ -24,6 +25,7 @@ describe("route parsing and link building", () => {
   it("builds readable hrefs for every section", () => {
     expect(routeHref({ view: "overview" })).toBe("?");
     expect(routeHref({ view: "tasks" })).toBe("?view=tasks");
+    expect(routeHref({ view: "tasks", taskId: "classify-text" })).toBe("?view=tasks&task=classify-text");
     expect(routeHref({ view: "roles", roleId: "writer" })).toBe("?view=roles&role=writer");
     expect(routeHref({ view: "products", guideId: "gemini" })).toBe("?view=products&guide=gemini");
     expect(routeHref({ view: "search", query: "few shot" })).toBe("?view=search&q=few+shot");

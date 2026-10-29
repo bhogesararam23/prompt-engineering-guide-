@@ -20,6 +20,7 @@ export type RouteState = {
   lessonId: string | null;
   roleId: string | null;
   guideId: string | null;
+  taskId: string | null;
   query: string;
 };
 
@@ -39,7 +40,7 @@ const VIEWS: ReadonlySet<string> = new Set<View>([
   "workflows"
 ]);
 
-const OVERVIEW: RouteState = { view: "overview", lessonId: null, roleId: null, guideId: null, query: "" };
+const OVERVIEW: RouteState = { view: "overview", lessonId: null, roleId: null, guideId: null, taskId: null, query: "" };
 
 function asView(value: string | null): View | null {
   return value !== null && VIEWS.has(value) ? (value as View) : null;
@@ -57,6 +58,7 @@ export function parseRoute(search: string): RouteState {
     lessonId: null,
     roleId: view === "roles" ? params.get("role") : null,
     guideId: view === "products" ? params.get("guide") : null,
+    taskId: view === "tasks" ? params.get("task") : null,
     query: view === "search" ? params.get("q") ?? "" : ""
   };
 }
@@ -75,6 +77,7 @@ export function routeHref(route: Partial<RouteState> & { view: View }): string {
   }
   if (route.view === "roles" && route.roleId) params.set("role", route.roleId);
   if (route.view === "products" && route.guideId) params.set("guide", route.guideId);
+  if (route.view === "tasks" && route.taskId) params.set("task", route.taskId);
   if (route.view === "search" && route.query) params.set("q", route.query);
   const encoded = params.toString();
   return encoded ? "?" + encoded : "?";
