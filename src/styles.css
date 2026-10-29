@@ -128,3 +128,110 @@
 .skip-link:focus{transform:translateY(0);outline:3px solid #fff;outline-offset:3px}
 .main-content:focus{outline:none}
 .nav-item:focus-visible,.button:focus-visible,.text-button:focus-visible,.disclosure-button:focus-visible,.category-list button:focus-visible,.lesson-list-item:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* Learning-first sections: by task, by profession, by AI tool, search */
+.section-intro{max-width:840px;margin-bottom:16px;padding:16px 18px;border:1px solid #48503a;border-radius:9px;background:#c9f27c08}
+.section-intro .eyebrow{margin:0 0 7px;color:var(--accent);font-size:9px}
+.section-intro strong{font-size:13px;color:#dce8cd}
+.section-intro p{margin:7px 0 0;color:#a5aa9c;font-size:11px;line-height:1.8}
+.filter-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.filter-row button{padding:7px 10px;border:1px solid #333640;border-radius:5px;color:#a3a7b4;background:#1b1e24;font-size:10px}
+.filter-row button.selected{border-color:#697d4e;color:var(--accent);background:#c9f27c11}
+.task-scenario-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+.task-scenario-card{min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--panel);overflow:hidden}
+.task-scenario-card.expanded{border-color:#48533b}
+.task-scenario-trigger{width:100%;display:flex;flex-direction:column;align-items:flex-start;gap:9px;padding:16px;border:0;color:var(--text);background:transparent;text-align:left}
+.task-scenario-trigger:hover{background:#c9f27c05}
+.task-scenario-top,.task-scenario-bottom{display:flex;justify-content:space-between;gap:10px;width:100%}
+.task-scenario-index{color:var(--accent);font:10px var(--mono)}
+.task-scenario-area{padding:4px 6px;border:1px solid #373a44;border-radius:4px;color:#a9adba;font-size:9px}
+.task-scenario-trigger>strong{font-size:14px;line-height:1.45}
+.task-scenario-trigger>p{margin:0;color:#a1a6b4;font-size:11px;line-height:1.8}
+.task-scenario-bottom{color:#858a98;font:9px var(--mono)}
+.task-scenario-bottom span:last-child{color:var(--accent)}
+.task-scenario-detail{display:grid;gap:15px;padding:16px;border-top:1px solid var(--line)}
+.task-scenario-rationale{margin:0;color:#a9adba;font-size:11px;line-height:1.8}
+.prompt-compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.prompt-compare-column small{display:block;margin-bottom:6px;font:9px var(--mono);letter-spacing:1px}
+.prompt-compare-column.weak small{color:#e9a9a9}
+.prompt-compare-column.improved small{color:var(--accent)}
+.prompt-compare-column pre{height:100%;margin:0;padding:12px;border:1px solid #30343d;border-radius:7px;background:#101216;white-space:pre-wrap;overflow-wrap:anywhere;color:#d4d7e0;font:10px/1.8 var(--mono)}
+.prompt-compare-column.weak pre{border-color:#4a3434}
+.prompt-compare-column.improved pre{border-color:#414b34}
+.task-scenario-block h3,.role-detail-block h3,.product-detail-block h3{margin:0 0 8px;color:#d2d5de;font-size:11px}
+.task-scenario-block ol,.task-scenario-block ul,.role-detail-block ul,.product-detail-block ul{display:grid;gap:6px;margin:0;padding-left:19px;color:#a3a8b5;font-size:10px;line-height:1.75}
+.task-scenario-block li::marker,.role-self-check li::marker,.product-checklist li::marker{color:var(--accent)}
+.practice-block{padding:12px 14px;border:1px solid #3c4432;border-radius:7px;background:#171b15}
+.practice-block p{margin:0;color:#c7d2b8;font-size:11px;line-height:1.8}
+.task-scenario-actions,.product-detail-actions{display:flex;flex-wrap:wrap;gap:8px}
+.role-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+.role-card{min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--panel);overflow:hidden}
+.role-card.expanded{border-color:#48533b}
+.role-card-trigger{width:100%;display:flex;flex-direction:column;align-items:flex-start;gap:9px;padding:16px;border:0;color:var(--text);background:transparent;text-align:left}
+.role-card-trigger:hover{background:#c9f27c05}
+.role-card-top,.role-card-bottom{display:flex;justify-content:space-between;gap:10px;width:100%}
+.role-card-index{color:var(--accent);font:10px var(--mono)}
+.role-card-minutes{color:#858a98;font:9px var(--mono)}
+.role-card-trigger>strong{font-size:14px}
+.role-card-trigger>p{margin:0;color:#a1a6b4;font-size:11px;line-height:1.7}
+.role-card-outcome{color:#c3c9bc;font-size:11px;line-height:1.75}
+.role-card-bottom{color:#858a98;font:9px var(--mono)}
+.role-card-bottom span:last-child{color:var(--accent)}
+.role-detail{display:grid;gap:15px;padding:16px;border-top:1px solid var(--line)}
+.role-route{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.role-route li{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:9px 10px;border:1px solid #2f323a;border-radius:6px;background:#121419}
+.role-route button{border:0;padding:0;color:#cfe5b0;background:transparent;font-size:11px;text-align:left}
+.role-route button:hover{color:var(--accent);text-decoration:underline}
+.role-route small{flex:0 0 auto;color:#9398a5;font:9px var(--mono)}
+.role-task-links,.product-lesson-links{display:flex;flex-wrap:wrap;gap:7px}
+.role-task-links button,.product-lesson-links button{padding:7px 9px;border:1px solid #343741;border-radius:5px;color:#c1c4cf;background:#202229;font-size:10px}
+.role-task-links button:hover,.product-lesson-links button:hover{color:var(--accent);border-color:#6c7d4d}
+.role-capstone{padding:13px;border:1px solid #3c4432;border-radius:7px;background:#171b15}
+.role-capstone p{margin:0;color:#c7d2b8;font-size:11px;line-height:1.8}
+.role-footer{margin-top:14px}
+.product-tier{margin-top:26px}
+.product-tier>h2{margin:0 0 13px;font-size:17px;letter-spacing:-.4px}
+.product-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:start}
+.product-card{min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--panel);overflow:hidden}
+.product-card.expanded{border-color:#48533b}
+.product-card-trigger{width:100%;display:flex;flex-direction:column;align-items:flex-start;gap:9px;padding:16px;border:0;color:var(--text);background:transparent;text-align:left}
+.product-card-trigger:hover{background:#c9f27c05}
+.product-card-top,.product-card-bottom{display:flex;justify-content:space-between;gap:10px;width:100%}
+.product-card-vendor{color:var(--accent);font:10px var(--mono)}
+.product-card-verified{color:#858a98;font:9px var(--mono)}
+.product-card-trigger>strong{font-size:15px}
+.product-card-trigger>p{margin:0;color:#a1a6b4;font-size:11px;line-height:1.75}
+.product-card-bottom{color:#858a98;font:9px var(--mono)}
+.product-card-bottom span:last-child{color:var(--accent)}
+.product-detail{display:grid;gap:15px;padding:16px;border-top:1px solid var(--line)}
+.product-privacy{padding:12px 14px;border:1px solid #4a503b;border-radius:7px;background:#c9f27c09}
+.product-privacy strong{color:#dce8cd;font-size:10px}
+.product-privacy p{margin:6px 0 0;color:#a5aa9c;font-size:10px;line-height:1.75}
+.product-sources ul{padding-left:0;list-style:none}
+.product-sources a{color:#cde9a4;font-size:11px;text-decoration:none;overflow-wrap:anywhere}
+.product-sources a:hover{color:#e0ffc0;text-decoration:underline}
+.product-source-note,.product-review-window{margin:9px 0 0;color:#858a98;font-size:9px;line-height:1.7}
+.site-search-box{display:grid;gap:8px;margin-bottom:16px;padding:15px;border:1px solid var(--line);border-radius:9px;background:var(--panel)}
+.site-search-box label{color:#8c909e;font:9px var(--mono);letter-spacing:1px}
+.site-search-box input{width:100%;padding:11px;border:1px solid #333640;border-radius:6px;outline:none;color:var(--text);background:#101216;font-size:12px}
+.site-search-box input:focus{border-color:#91ad5e}
+.site-search-count{color:#a6aab5;font:10px var(--mono)}
+.site-search-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.site-search-result{display:grid;gap:7px;padding:15px;border:1px solid var(--line);border-radius:9px;color:var(--text);background:var(--panel);text-align:left}
+.site-search-result:hover{border-color:#556244;background:#1b1e20}
+.site-search-kind{width:fit-content;padding:4px 6px;border:1px solid #373a44;border-radius:4px;color:#a9adba;font-size:9px}
+.site-search-result strong{font-size:13px}
+.site-search-result p{margin:0;color:#9297a4;font-size:10px;line-height:1.7}
+.site-search-open{color:var(--accent);font-size:10px;font-weight:700}
+.browse-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.browse-card{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-height:150px;padding:16px;border:1px solid var(--line);border-radius:10px;color:var(--text);background:var(--panel);text-align:left}
+.browse-card:hover{border-color:#556244;background:#1b1e20;transform:translateY(-2px)}
+.browse-card strong{font-size:13px}
+.browse-card p{margin:0;color:#9297a4;font-size:10px;line-height:1.75}
+.browse-card span{margin-top:auto;color:var(--accent);font-size:10px;font-weight:700}
+.lesson-products{margin-top:26px;padding:16px;border:1px solid var(--line);border-radius:8px;background:#13151a}
+.lesson-products h3{margin:0 0 10px;font-size:13px}
+.lesson-products ul{display:flex;flex-wrap:wrap;gap:8px 16px;margin:0;padding:0;list-style:none}
+@media(max-width:1150px){.product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.browse-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:850px){.task-scenario-grid,.role-grid,.site-search-results{grid-template-columns:1fr}.prompt-compare{grid-template-columns:1fr}}
+@media(max-width:590px){.product-grid,.browse-grid{grid-template-columns:1fr}}
