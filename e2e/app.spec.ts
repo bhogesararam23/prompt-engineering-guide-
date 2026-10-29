@@ -205,6 +205,65 @@ test("workflow evaluation scores the starter graph against the same local datase
 });
 
 
+test("by task scenarios open, explain their changes, and link to the lesson", async ({ page }) => {
+  await page.goto("/");
+  const navigation = page.getByRole("navigation", { name: "Main navigation" });
+  await navigation.getByRole("button", { name: /By task/ }).click();
+  await expect(page.getByRole("heading", { name: "Learn by task" })).toBeVisible();
+
+  await page.getByRole("group", { name: "Filter scenarios by work area" }).getByRole("button", { name: "Coding", exact: true }).click();
+  const firstCard = page.locator(".task-scenario-card").first();
+  await firstCard.getByRole("button").click();
+  await expect(page).toHaveURL(/view=tasks&task=/);
+  await expect(page.getByText("WEAK PROMPT", { exact: true })).toBeVisible();
+  await expect(page.getByText("IMPROVED PROMPT", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Common mistakes to avoid" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Practice exercise" })).toBeVisible();
+
+  await page.getByRole("button", { name: /Read the lesson:/ }).click();
+  await expect(page).toHaveURL(/lesson=/);
+  await expect(page.getByRole("heading", { name: "Learning guide" })).toBeVisible();
+});
+
+test("profession paths and AI product guides are addressable and source-linked", async ({ page }) => {
+  await page.goto("/");
+  const nav = page.getByRole("navigation", { name: "Main navigation" });
+  await nav.getByRole("button", { name: /By profession/ }).click();
+  await expect(page.getByRole("heading", { name: "Learn by profession" })).toBeVisible();
+  await page.locator(".role-card-trigger").first().click();
+  await expect(page).toHaveURL(/view=roles&role=/);
+  await expect(page.getByRole("heading", { name: "Your route" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Self-check" })).toBeVisible();
+
+  await nav.getByRole("button", { name: /By AI tool/ }).click();
+  await expect(page.getByRole("heading", { name: "Learn by AI" })).toBeVisible();
+  await page.locator(".product-card-trigger").first().click();
+  await expect(page).toHaveURL(/view=products&guide=/);
+  await expect(page.getByRole("heading", { name: "Official sources" })).toBeVisible();
+  const firstSource = page.locator(".product-sources a").first();
+  await expect(firstSource).toBeVisible();
+  expect(await firstSource.getAttribute("href")).toMatch(/^https:\/\//);
+  await expect(page.locator(".product-review-window")).toContainText("review due");
+});
+
+test("site search spans lessons, scenarios, paths, and guides locally", async ({ page }) => {
+  await page.goto("/");
+  const navigation = page.getByRole("navigation", { name: "Main navigation" });
+  await navigation.getByRole("button", { name: /Search/ }).click();
+  await expect(page.getByRole("heading", { name: "Search", exact: true })).toBeVisible();
+
+  await page.getByLabel("SEARCH EVERYTHING").fill("prompt injection");
+  await expect(page.getByRole("status")).toContainText("result");
+  await expect(page.locator(".site-search-result").first()).toContainText("Lesson");
+
+  await page.getByLabel("SEARCH EVERYTHING").fill("Claude");
+  const guideResult = page.locator(".site-search-result").filter({ hasText: "AI guide" }).first();
+  await expect(guideResult).toBeVisible();
+  await guideResult.click();
+  await expect(page).toHaveURL(/view=products&guide=/);
+  await expect(page.getByRole("heading", { name: "Learn by AI" })).toBeVisible();
+});
+
 test("keyboard users can skip repeated navigation and identify the current section", async ({ page }) => {
   await page.goto("/");
   const skipLink = page.getByRole("link", { name: "Skip to main content" });
