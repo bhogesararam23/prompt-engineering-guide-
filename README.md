@@ -8,6 +8,10 @@ A learning-first guide to prompt engineering: understand prompting techniques, l
 
 - Eight source-linked learning modules with stated outcomes, prerequisites, per-lesson contents, related lessons, and an explicit next step.
 - A curated task finder on the homepage that routes common jobs—classification, extraction, revision, safe document use, and more—to relevant lessons with a short rationale.
+- A task library of fourteen fully worked scenarios across writing, studying, research, coding, data analysis, business, marketing, and everyday work. Each scenario shows a weak-versus-improved prompt pair, a step-by-step explanation, common mistakes, and a practice exercise.
+- Nine profession-based routes (students, educators, researchers, developers, writers, marketers, founders, and adjacent roles) that sequence the existing lessons into an ordered path with local progress.
+- Sixteen AI product guides covering ChatGPT/OpenAI, Claude, Gemini, Microsoft Copilot, GitHub Copilot, Perplexity, DeepSeek, Qwen, Kimi, GLM, MiniMax, ERNIE, Tencent Hunyuan, Mistral, Llama, and Grok. Each guide states what differs from the general principles, links to official first-party documentation, and carries last-verified and review-due dates that are enforced by tests.
+- Local site search across lessons, scenarios, learning routes, and product guides. Everything is searched in the browser; no service or API key is involved.
 - Three progress-aware learning routes (Beginner, Everyday Work, Advanced/Technical) that resume at the first incomplete lesson using browser-local completion state.
 - Shareable lesson URLs with browser back/forward support; section links land directly on the relevant lesson heading.
 - Deterministic knowledge checks whose attempts and completion progress are saved locally.
@@ -24,7 +28,7 @@ A learning-first guide to prompt engineering: understand prompting techniques, l
 - An optional FastAPI/SQLite backend for explicitly managed prompt storage. It does not proxy a hosted LLM.
 - CI checks for the local-first policy, TypeScript, unit tests, production build, Playwright journeys, and backend tests.
 
-**Product direction:** the main goal is to become a professional learning site for prompt engineering. The task library, role-based paths, richer technique curriculum, and maintained company/product guides are planned—not claimed as complete. See the [learning-platform roadmap](docs/LEARNING_PLATFORM_ROADMAP.md).
+**Product direction:** the main goal is to become a professional learning site for prompt engineering. The task library, role-based paths, and first-party product guides now exist as first editions; the richer technique curriculum, deeper per-lesson practice, and the ongoing provider review cadence are still in progress—not claimed as complete. See the [learning-platform roadmap](docs/LEARNING_PLATFORM_ROADMAP.md).
 
 ## Frontend setup
 

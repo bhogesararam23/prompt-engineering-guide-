@@ -36,6 +36,19 @@ This is a first slice of Phase 1—not a claim that the phase exit gate is compl
 **North-star outcome:** learners can choose a suitable prompting approach for a real task, explain why it fits, assess the result against clear criteria, improve a failing prompt, and recognize when human review or a different solution is required.
 
 
+## Learning sections implementation checkpoint
+
+The three learning entry points described in the priority order now exist as first editions, built on the lesson-navigation foundation:
+
+- **By task** — a library of fourteen fully worked scenarios covering writing, studying, research, coding, data analysis, business, marketing, and everyday work. Each scenario pairs a weak prompt with an improved one, explains the changes, lists common mistakes, and ends with a practice exercise. Scenarios are addressable by query parameter so they can be linked and shared.
+- **By profession** — nine ordered routes for students, educators, researchers, developers, writers, marketers, founders, and adjacent roles, assembled from the existing lessons so that no duplicate lesson content is introduced. Routes reuse the same local progress tracking as the built-in learning paths.
+- **By AI tool** — sixteen product guides covering the major general-purpose and Chinese-market models and assistants. Every guide leads with what transfers from the general principles, then states product-specific differences with links to official first-party documentation. Last-verified and review-due dates are part of the data contract and are checked by tests.
+- **Site search** — a single local search box across lessons, scenarios, routes, and product guides, so the growing catalogue stays navigable without a hosted search service.
+
+All four sections are reachable from the homepage and the main navigation, and the new data modules and route helpers have unit tests. The production build, TypeScript check, unit suite (99 tests), and the full Playwright browser suite (14 journeys) pass.
+
+Remaining work from this checkpoint: route-level page metadata and crawlability decisions for the query-based URLs, executing the documented provider review cadence (dates exist; re-verification is manual), a fuller mobile/keyboard/screen-reader audit of the new sections, and learner usability feedback.
+
 ## Accessibility implementation checkpoint
 
 - Added a keyboard-visible skip link that targets the main content landmark.
